@@ -10,7 +10,7 @@
             <input type="text" name="searchd" value="" id="search_box" />
             <input type="submit" value="search" id="search_btn"/>
         </form>
-        <p id="desc_text">SprocketFish is an auto enthusiast forum powered search engine.</p>
+        <p id="desc_text">SprocketFish is an auto enthusiast powered search engine.</p>
     </div> 
     <center>
     <p id="category_text">Browse by Forum Source</p>
