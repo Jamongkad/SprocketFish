@@ -1,6 +1,6 @@
 <%inherit file="base.mako" />
 <%def name="title()">
-    SprocketFish!
+    SprocketFish 
 </%def>
 
 <div style="text-align:center">
