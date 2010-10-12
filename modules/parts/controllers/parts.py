@@ -25,14 +25,12 @@ class search(object):
         cl.SetServer("127.0.0.1", 3312)
         res = cl.Query(u['searchd'])
         ids = res['matches']
-        ids_list = []
-        if ids: 
-            for i in ids:
-                ids_list.append(i['id'])
 
-        string = [str(x) for x in ids_list] 
-        bunch =  ", ".join(string)
-        sql = """select 
+        if ids: 
+            ids_list = [i['id'] for i in ids]
+
+        bunch =  ", ".join( [str(x) for x in ids_list] )
+        sql = """SELECT 
                     SUBSTRING_INDEX( SUBSTRING_INDEX(listings_posts.idlistings_posts, ':', 2), ':', -1) AS post_id
                   , data_prep.list_title AS title
                   , listings_posts.idlistings_posts AS list_id
@@ -40,20 +38,20 @@ class search(object):
                   , listings_posts.list_text_text AS text
                   , listings_posts.list_text_html AS html
                   , listings_posts.list_author AS auth
-                from 
+                FROM 
                     data_prep 
                 INNER JOIN
                     listings_posts
                     ON data_prep.list_sku = listings_posts.list_sku
                 where 1=1 
                     AND SUBSTRING_INDEX( SUBSTRING_INDEX(listings_posts.idlistings_posts, ':', 2), ':', -1)  IN (%s)
-                GROUP BY
-                    sku
+                    AND listings_posts.list_starter = 1
                 ORDER BY 
                     sku DESC""" % (bunch)
 
         rp = db.bind.execute(sql)
-        return rp.fetchall()
+        return render('search_results.mako', rp=rp, search_term=u['searchd'])
+        
 
         
 

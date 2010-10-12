@@ -12,6 +12,8 @@ except:
     raise
 
 def crawler(storage_list, **keywords):
+     
+    storage_list = filter_urls(storage_list, keywords['post_regex'])
 
     site_id = sql_db.site.filter(sql_db.site.site_nm==keywords['site_id']).first()
     br = keywords['mecha_state']
@@ -210,3 +212,8 @@ class ProcessDataPosts(object):
             storage[self.authors[i]] = clean_posts[i]
 
         return storage
+
+
+def filter_urls(storage_list, regex):
+    urls = [i for i in storage_list if re.compile(regex).findall(i.url)]
+    return urls
