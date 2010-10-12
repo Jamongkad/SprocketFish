@@ -9,7 +9,7 @@ from SprocketAuth import SprocketAuth
 
 from db import User, Job, session, sql_db as db
 
-import welcome, site_admin, masthead, header, job
+import welcome, site_admin, masthead, header, job, parts
 
 web.config.debug = True
 
@@ -21,7 +21,8 @@ urls = (
     '/create_account', 'create_account',
     '/welcome', welcome.app,
     '/site', site_admin.app,
-    '/job', job.app
+    '/job', job.app, 
+    '/parts', parts.app
 )
 
 app = web.application(urls, globals(), autoreload=True)
