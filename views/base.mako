@@ -23,7 +23,7 @@
         ${self.body()}  
     </div>
 
-    <div style="text-align: center; margin-top: 150px; font-size: 10px">
+    <div style="text-align: center; margin-top: 100px; margin-bottom: 100px;  font-size: 10px">
         about | legal | twitter | facebook | suppliers | &copy;2010 sprocketfish
     </div>
     </body>

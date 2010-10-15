@@ -18,7 +18,7 @@
     <table>
         <tr>
             % for site in sites:
-                <td id="forum_node"><a href="">${site.site_nm}</a></td> 
+                <td id="forum_node"><a href="/parts/sortby/${site.site_nm}">${site.site_nm}</a></td> 
             % endfor
         </tr>
     </table>

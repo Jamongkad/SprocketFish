@@ -12,16 +12,16 @@
         </form>
     </div>  
     <p style="height: 30px"></p>
-
+    <%! import re %>
     <div id="search_results" class="prefix_1">
-    % for post_id, title, list_id, sku, text, html, auth in rp.fetchall():
-        <div class="crd1 cl1 suffix_3">
-            <div id="brand">${sku.split(":")[0]}</div>
-            <div style=""><a class="l le" href="/parts/view_topic/${sku}">${title}</a></div> 
-            <%! import re %>
-            <div>${" ".join(unicode(text, errors="ignore").split(" ")[0:40])}...</div>
-        </div>
-    % endfor
+        % for i in rp:
+            % for d in i['obj_data']:
+                <div class="crd1 cl1 suffix_2">
+                    <div style=""><a class="l le" href="/parts/view/${d[3]}">${unicode(d[1], errors="ignore")}</a><span id="brand"> ${d[3].split(":")[0]}</span></div> 
+                    <div style="line-height: 1.4">${" ".join(unicode(d[4], errors="ignore").split(" ")[0:40])}...</div>
+                </div>
+            % endfor 
+        % endfor
     </div>
 </div>
 
