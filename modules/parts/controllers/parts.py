@@ -5,7 +5,8 @@ from pymongo import Connection
 from pymongo.objectid import ObjectId
 from view import render
 from myrequest import Request
-import nltk
+import nltk, itertools, string, MultiDict
+
 
 from db import User, Job, session, sql_db as db
 import sphinxapi 
@@ -18,6 +19,11 @@ urls = (
 app = web.application(urls, globals(), autoreload=True)
 from SprocketAuth import SprocketAuth
 sa = SprocketAuth(app)
+
+
+def take_items(search_terms, other):
+    search_terms.sent.update(other.terms)
+    return search_terms
 
 class search(object):
    
@@ -42,23 +48,23 @@ class search(object):
     def _sku_info(self, post_id, search_term):
 
         sql = """
-                SELECT 
-                    SUBSTRING_INDEX( SUBSTRING_INDEX(listings_posts.idlistings_posts, ':', 2), ':', -1) AS post_id
-                  , data_prep.list_title AS title
-                  , listings_posts.idlistings_posts AS list_id
-                  , data_prep.list_sku AS sku
-                  , listings_posts.list_text_text AS text
-                  , listings_posts.list_text_html AS html
-                  , listings_posts.list_author AS auth
-                FROM 
-                    data_prep 
-                INNER JOIN
-                    listings_posts
-                    ON data_prep.list_sku = listings_posts.list_sku
-                where 1=1 
-                    AND SUBSTRING_INDEX( SUBSTRING_INDEX(listings_posts.idlistings_posts, ':', 2), ':', -1) = %s 
-                    AND listings_posts.list_starter = 1 
-                """ % (post_id)
+            SELECT 
+                SUBSTRING_INDEX( SUBSTRING_INDEX(listings_posts.idlistings_posts, ':', 2), ':', -1) AS post_id
+              , data_prep.list_title AS title
+              , listings_posts.idlistings_posts AS list_id
+              , data_prep.list_sku AS sku
+              , listings_posts.list_text_text AS text
+              , listings_posts.list_text_html AS html
+              , listings_posts.list_author AS auth
+            FROM 
+                data_prep 
+            INNER JOIN
+                listings_posts
+                ON data_prep.list_sku = listings_posts.list_sku
+            where 1=1 
+                AND SUBSTRING_INDEX( SUBSTRING_INDEX(listings_posts.idlistings_posts, ':', 2), ':', -1) = %s 
+                AND listings_posts.list_starter = 1 
+            """ % (post_id)
 
         rp = db.bind.execute(sql)
 
@@ -76,17 +82,32 @@ class search(object):
         return storage
 
     def _determine_match(self, text, search_term):
-        storage = []
+        storage = {}
         for term in search_term:
-            matches = [sent for sent in text if term in sent.lower()]
+            matches = [sent for sent in text if term in sent.lower()] 
             for match in matches:
-                storage.append({
-                    'term' : match,
-                    'match' : term
-                })
+                storage.setdefault(match, [])
+                storage[match].append(term)
 
+        result = MultiDict.OrderedMultiDict() 
         return storage
- 
+        #list_terms = {}
+            #for k, grp in itertools.groupby(storage, lambda i : i.terms):
+            #print k 
+   
+        #return list_terms
+        #list_terms = [reduce(take_items, g)
+        #              for k, g in itertools.groupby(storage, lambda i : i.terms)]
+
+        #return list_terms
+
+        #collections = dict()
+        #for l in storage:
+        #    for c, vals in l.iteritems():
+        #        collections.setdefault(vals, [])
+        
+        #return collections
+         
 class view(object):
     def GET(self, list_id):
         sql = """
@@ -128,3 +149,17 @@ class sortby(object):
         """ % (site_id) 
         rp = db.bind.execute(sql)
         return rp.fetchall()
+
+class SearchTerms(object):
+    def __init__(self, terms, sent):
+        self.terms = terms
+        self.sent = sent
+
+class Sentences(object):
+    def __init__(self, sent):
+        self.sent = sent
+
+    def show_string(self, sent):
+        exclude = set(string.punctuation)
+        s = "".join(ch for ch in sent if ch not in exclude)
+        return s.replace(" ", "_")
