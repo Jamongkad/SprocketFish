@@ -6,7 +6,7 @@
 <div style="text-align:center">
     <div id="title">Sprocket<span id="logo">Fish</span></div>       
     <div id="searchd">
-        <form method="post" action="/parts/search">
+        <form method="POST" action="/parts/search">
             <input type="text" name="searchd" value="" id="search_box" />
             <input type="submit" value="search" id="search_btn"/>
         </form>

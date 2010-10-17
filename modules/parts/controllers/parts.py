@@ -5,6 +5,7 @@ from pymongo import Connection
 from pymongo.objectid import ObjectId
 from view import render
 from myrequest import Request
+import nltk
 
 from db import User, Job, session, sql_db as db
 import sphinxapi 
@@ -19,6 +20,7 @@ from SprocketAuth import SprocketAuth
 sa = SprocketAuth(app)
 
 class search(object):
+   
     def POST(self):
         u = Request().POST
         
@@ -29,13 +31,15 @@ class search(object):
         res = cl.Query(u['searchd'])
         ids = res['matches']
         
-        ids_list = []
-        if ids: 
-            ids_list = [{'id': i['id'], 'weight': i['weight'], 'obj_data': self._sku_info(i['id'])} for i in ids]
+        #ids_list = []
+        #if ids: 
+        #    ids_list = [('obj_data', self._sku_info(i['id'])) for i in ids]
   
-        return render('search_results.mako', rp=ids_list, search_term=u['searchd'])
+        #return ids_list
+        #return render('search_results.mako', rp=ids_list, search_term=u['searchd'])
+        print self._sku_info(7420957, search_term='cams skunk2')
        
-    def _sku_info(self, post_id):
+    def _sku_info(self, post_id, search_term):
 
         sql = """
                 SELECT 
@@ -57,7 +61,31 @@ class search(object):
                 """ % (post_id)
 
         rp = db.bind.execute(sql)
-        return rp.fetchall()
+
+        storage = {}
+        for num, entry in enumerate(rp.fetchall()):
+            storage = {
+                #'post_id' : entry[0], 
+                #'title' : entry[1],
+                #'list_id' : entry[2],
+                #'text' : nltk.sent_tokenize(entry[4]),
+                #'srch_trm' : search_term.split(" "),
+                'matches' : self._determine_match(nltk.sent_tokenize(entry[4]), search_term.split(" "))
+            }
+
+        return storage
+
+    def _determine_match(self, text, search_term):
+        storage = []
+        for term in search_term:
+            matches = [sent for sent in text if term in sent.lower()]
+            for match in matches:
+                storage.append({
+                    'term' : match,
+                    'match' : term
+                })
+
+        return storage
  
 class view(object):
     def GET(self, list_id):
