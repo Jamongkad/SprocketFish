@@ -5,7 +5,7 @@ from pymongo import Connection
 from pymongo.objectid import ObjectId
 from view import render
 from myrequest import Request
-import nltk, itertools, string, MultiDict
+import nltk, itertools, string, MultiDict, pprint
 
 
 from db import User, Job, session, sql_db as db
@@ -20,32 +20,27 @@ app = web.application(urls, globals(), autoreload=True)
 from SprocketAuth import SprocketAuth
 sa = SprocketAuth(app)
 
-
-def take_items(search_terms, other):
-    search_terms.sent.update(other.terms)
-    return search_terms
-
 class search(object):
-   
-    def POST(self):
-        u = Request().POST
-        
+
+    def GET(self):
+        u = web.input()
+        search_query = u['searchd']
+
         cl = sphinxapi.SphinxClient()
         cl.SetServer("127.0.0.1", 3312)
         cl.SetMatchMode(sphinxapi.SPH_MATCH_ALL)
         cl.SetSortMode(sphinxapi.SPH_SORT_RELEVANCE)
-        res = cl.Query(u['searchd'])
+        res = cl.Query(search_query)
+
         ids = res['matches']
         
-        #ids_list = []
-        #if ids: 
-        #    ids_list = [('obj_data', self._sku_info(i['id'])) for i in ids]
-  
-        #return ids_list
-        #return render('search_results.mako', rp=ids_list, search_term=u['searchd'])
-        print self._sku_info(7420957, search_term='cams skunk2')
-       
-    def _sku_info(self, post_id, search_term):
+        ids_list = []
+        if ids: 
+            ids_list = [self._sku_info(i['id'], search_query, cl) for i in ids]
+ 
+        return render('search_results.mako', rp=ids_list, search_term=search_query)
+    
+    def _sku_info(self, post_id, search_term, cl):
 
         sql = """
             SELECT 
@@ -69,45 +64,19 @@ class search(object):
         rp = db.bind.execute(sql)
 
         storage = {}
-        for num, entry in enumerate(rp.fetchall()):
+        docs = []
+        for entry in rp.fetchall():
+            docs.append(unicode(entry[4], errors="ignore"))
             storage = {
-                #'post_id' : entry[0], 
-                #'title' : entry[1],
-                #'list_id' : entry[2],
-                #'text' : nltk.sent_tokenize(entry[4]),
-                #'srch_trm' : search_term.split(" "),
-                'matches' : self._determine_match(nltk.sent_tokenize(entry[4]), search_term.split(" "))
+                'post_id' : entry[0], 
+                'title' : entry[1],
+                'list_id' : entry[2], 
+                'sku' : entry[3],
+                'excerpts' : cl.BuildExcerpts(docs, 'posts', search_term, { 'single_passage' : True })
             }
 
         return storage
 
-    def _determine_match(self, text, search_term):
-        storage = {}
-        for term in search_term:
-            matches = [sent for sent in text if term in sent.lower()] 
-            for match in matches:
-                storage.setdefault(match, [])
-                storage[match].append(term)
-
-        result = MultiDict.OrderedMultiDict() 
-        return storage
-        #list_terms = {}
-            #for k, grp in itertools.groupby(storage, lambda i : i.terms):
-            #print k 
-   
-        #return list_terms
-        #list_terms = [reduce(take_items, g)
-        #              for k, g in itertools.groupby(storage, lambda i : i.terms)]
-
-        #return list_terms
-
-        #collections = dict()
-        #for l in storage:
-        #    for c, vals in l.iteritems():
-        #        collections.setdefault(vals, [])
-        
-        #return collections
-         
 class view(object):
     def GET(self, list_id):
         sql = """
@@ -150,16 +119,3 @@ class sortby(object):
         rp = db.bind.execute(sql)
         return rp.fetchall()
 
-class SearchTerms(object):
-    def __init__(self, terms, sent):
-        self.terms = terms
-        self.sent = sent
-
-class Sentences(object):
-    def __init__(self, sent):
-        self.sent = sent
-
-    def show_string(self, sent):
-        exclude = set(string.punctuation)
-        s = "".join(ch for ch in sent if ch not in exclude)
-        return s.replace(" ", "_")

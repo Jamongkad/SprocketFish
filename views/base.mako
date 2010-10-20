@@ -24,7 +24,7 @@
     </div>
 
     <div style="text-align: center; margin-top: 100px; margin-bottom: 100px;  font-size: 10px">
-        about | legal | twitter | facebook | suppliers | &copy;2010 sprocketfish
+        about | legal | twitter | facebook | suppliers | &copy;2010 GearFish
     </div>
     </body>
 </html>
