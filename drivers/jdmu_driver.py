@@ -2,6 +2,7 @@ from dataprocess import crawler, test_crawler
 import mechanize, urllib
 import cookielib, re
 from pyquery import PyQuery as pq
+from PageData import PageData
 
 url = 'http://z11.invisionfree.com/JDM_Underground'
 br = mechanize.Browser(factory=mechanize.RobustFactory())  
@@ -21,7 +22,12 @@ page = 1
 
 post_content = 'div.postcolor'
 post_author = 'span.normalname a span'
-site = 'JDMU'
+
+orig_post_date = 'span.postdetails:first'
+edited_post_date = 'span.edit:first'
+date_regex = '([A-Za-z]{3}\s[0-9]{1,2}\s[0-9]{4})'
+
+site_id = 'JDMU'
 regex = 'index.php\?showtopic=(\d+)'
 
 nxt_pge_cnt = 40
@@ -38,7 +44,13 @@ while(processing):
         listings = pq(res.read())
         lists = listings('td.darkrow1').eq(5).parents('tr').siblings('tr').children('td > a[href*="showtopic"]').not_('.linkthru')
         storage_list = lists.map(lambda i, e: br.find_link(text=pq(e).text().replace("  ", " ")))
-        crawler(storage_list, mecha_state=br, content=post_content, author=post_author, post_regex=regex, site_id=site, reform_url=False)
+
+        pd = PageData(storage_list, br)\
+                 .add_content(post_content, post_author, regex)\
+                 .post_date(orig_post_date, edited_post_date, date_regex)\
+                 .with_site_id(site_id).if_reform_url(False)
+
+        crawler(pd) 
         page += 1
         br.back()
     else:
@@ -48,9 +60,16 @@ while(processing):
         res_pg_2 = br.open(next_page_url)
         listings_2 = pq(res_pg_2.read())
         storage_list_2 = listings_2('td.row4 > a[href*="showtopic"]').map(lambda i, e: br.find_link(url=pq(e).attr('href')))
-        crawler(storage_list_2, mecha_state=br, content=post_content, author=post_author, post_regex=regex, site_id=site, reform_url=False)
+
+        pd = PageData(storage_list_2, br)\
+                 .add_content(post_content, post_author, regex)\
+                 .post_date(orig_post_date, edited_post_date, date_regex)\
+                 .with_site_id(site_id).if_reform_url(False)
+
+        crawler(pd)
         nxt_pge_cnt += 40
         br.back()
 
         if(nxt_pge_cnt == end_pge_cnt):
             processing = False
+
