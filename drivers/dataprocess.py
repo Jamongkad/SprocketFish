@@ -30,10 +30,10 @@ def crawler(pd):
         get_edit_date = d(pd.edit_date).text()
 
         if get_date: 
-            (c_date, ) = re.compile(pd.date_regex).findall(get_date)
+            c_date = re.compile(pd.date_regex).findall(get_date)
 
         if get_edit_date:
-            (e_date, ) = re.compile(pd.date_regex).findall(get_edit_date) 
+            e_date = re.compile(pd.date_regex).findall(get_edit_date) 
 
         linky = links.text
 
@@ -53,7 +53,6 @@ def crawler(pd):
 
         #database stuff
         try:
-            #pdp = ProcessDataPosts(posts, authors, pd.site_id, c_date, e_date)
             date = current_date(get_date, get_edit_date, pd.date_regex)
             print "extracting post id for sku..."
             if matches:
@@ -66,11 +65,11 @@ def crawler(pd):
                 print "failure in sku extraction..."
                 sys.exit()   
 
-            pdp = ProcessDataPosts(posts, authors, pd.site_id, date)
-            check_update_post(my_list, site_id, url, sku, l_title, pdp)
+            #pdp = ProcessDataPosts(posts, authors, pd.site_id, date)
+            #check_update_post(my_list, site_id, url, sku, l_title, pdp)
 
-        except Exception, err:
-            print "something went wrong! rolling back table! ERROR: %s" % (str(err))
+        except Exception, (ErrorNumber, ErrorMessage):
+            print "something went wrong! rolling back table! LINE: %s and ERROR: %s" % (str(ErrorNumber), str(ErrorMessage))
             sql_db.rollback()
             sys.exit()
 

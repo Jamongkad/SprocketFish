@@ -119,3 +119,5 @@ class sortby(object):
         rp = db.bind.execute(sql)
         return rp.fetchall()
 
+def matrank(weight, num_of_photos):
+    return weight + num_of_photos * 0.70 + 0.30
