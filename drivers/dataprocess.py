@@ -181,11 +181,9 @@ class ProcessDataPosts(object):
 
 
 def fine_tune_urls(storage_list, regex):
-    urls = [i for i in storage_list if re.compile(regex).findall(i.url)]
-    return urls
+    return [i for i in storage_list if re.compile(regex).findall(i.url)]
 
 def current_date(get_date, get_edit_date, date_regex):
-    post_date = None
 
     if get_date and get_edit_date is None:
         post_date = re.compile(date_regex).findall(get_date) 

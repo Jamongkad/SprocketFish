@@ -33,11 +33,8 @@ end_pge_cnt = 80
 
 def determine_encode(tex):
     if type(tex) is unicode:
-        res = br.find_link(text_regex=tex)
-    else:
-        res = br.find_link(text=tex)
-
-    return res
+        return br.find_link(text_regex=tex)
+    return br.find_link(text=tex)
 
 while(processing):
     print "Going Car Related posts..."
