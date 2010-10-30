@@ -1,7 +1,8 @@
 import mechanize, urllib
 import cookielib, re
 from pyquery import PyQuery as pq
-from dataprocess import crawler, test_crawler
+from dataprocess import crawler
+from PageData import PageData
 
 url = 'http://www.mitsulancerph.net/yabb2/YaBB.pl'
 br = mechanize.Browser(factory=mechanize.RobustFactory())  
@@ -18,15 +19,17 @@ br.submit()
 
 print "login in successful!"
 
-html = pq(br.response().read())
-
 processing = True
 page = 1
 
 post_content = 'div.message:first'
 post_author = 'a[href*="username"]:first'
-site = 'MLPH'
+site_id = 'MLPH'
 regex = 'num=(\d+)'
+
+edited_post_date = 'i:first'
+
+date_regex = "(Yesterday|Today|[0-9]{1,2}/[0-9]{1,2}/[0-9]{1,2})"
 
 nxt_pge_cnt = 20
 end_pge_cnt = 80
@@ -49,10 +52,24 @@ while(processing):
             lambda i, e: pq(e).text() if not re.compile('(DISCLAIMER|CHECK THE)').findall(pq(e).text()) else None
         )
         storage_list = [determine_encode(link) for link in lists] 
-        crawler(storage_list, mecha_state=br, content=post_content, author=post_author, post_regex=regex, site_id=site, reform_url=False)
+    
+        text_dates = listings('span.small > a[href*=".pl?num="]').text()
+        dates = re.compile(date_regex).findall(text_dates)
+        dates[1:3] = []
+
+        store = []
+        for idx, i in enumerate(storage_list):
+            i.post_date = dates[idx]
+            store.append(i)
+        
+        pd = PageData(store, br)\
+                 .add_content(post_content, post_author, regex)\
+                 .post_date(None, edited_post_date, date_regex)\
+                 .with_site_id(site_id).if_reform_url(False)
+        
+        crawler(pd)
         page += 1
-        br.back()
-       
+        br.back() 
     else:
         next_page_url = "http://www.mitsulancerph.net/yabb2/YaBB.pl?board=Caritems/%s" % (nxt_pge_cnt)
         print "Page Count at %s" % (nxt_pge_cnt)
@@ -63,10 +80,24 @@ while(processing):
             lambda i, e: pq(e).text() if not re.compile('(DISCLAIMER|CHECK THE)').findall(pq(e).text()) else None
         )
         storage_list = [determine_encode(link) for link in lists]   
-        crawler(storage_list, mecha_state=br, content=post_content, author=post_author, post_regex=regex, site_id=site, reform_url=False)
+
+        text_dates = listings('span.small > a[href*=".pl?num="]').text()
+        dates = re.compile(date_regex).findall(text_dates)
+
+        store = []
+        for idx, i in enumerate(storage_list):
+            i.post_date = dates[idx]
+            store.append(i)
+
+        pd = PageData(store, br)\
+                 .add_content(post_content, post_author, regex)\
+                 .post_date(None, edited_post_date, date_regex)\
+                 .with_site_id(site_id).if_reform_url(False)
+        
+        crawler(pd)
+
         nxt_pge_cnt += 20
         br.back()
 
         if(nxt_pge_cnt == end_pge_cnt):
             processing = False
-

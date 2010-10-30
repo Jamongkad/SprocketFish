@@ -1,4 +1,4 @@
-from dataprocess import crawler, test_crawler
+from dataprocess import crawler
 import mechanize, urllib
 import cookielib, re
 from pyquery import PyQuery as pq
@@ -54,7 +54,8 @@ while(processing):
         page += 1
         br.back()
     else:
-        next_page_url = "http://z11.invisionfree.com/JDM_Underground/index.php?showforum=3&prune_day=100&sort_by=Z-A&sort_key=last_post&st=%s" % (nxt_pge_cnt)
+        next_page_url = "http://z11.invisionfree.com/JDM_Underground/index.php?showforum=3&prune_day=100&sort_by=Z-A&sort_key=last_post&st=%s" \
+                         % (nxt_pge_cnt)
         print "Page Count at %s" % (nxt_pge_cnt)
         print "scraping page %s" % (next_page_url)
         res_pg_2 = br.open(next_page_url)

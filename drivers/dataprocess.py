@@ -5,6 +5,7 @@ import cookielib, re, sys
 from pyquery import PyQuery as pq
 import MultiDict
 from dateutil import parser
+from datetime import date, timedelta
 
 try: 
     sql_db = SqlSoup('mysql://mathew:p455w0rd@localhost/hero_fish_db?charset=utf8&use_unicode=0', echo=True)
@@ -25,9 +26,15 @@ def crawler(pd):
         d = pq(br.response().read()) 
         posts = d(pd.content).map(lambda i, e: (pq(e).text(), pq(e).html()))
         authors = d(pd.author).map(lambda i ,e: pq(e).text())
+        
+        if hasattr(pd, 'create_date'):
+            get_date = d(pd.create_date).text()
 
-        get_date = d(pd.create_date).text()
-        get_edit_date = d(pd.edit_date).text()
+        if hasattr(links, 'post_date'):
+            get_date = links.post_date
+
+        if hasattr(pd, 'edit_date'):
+            get_edit_date = d(pd.edit_date).text()
 
         if get_date: 
             c_date = re.compile(pd.date_regex).findall(get_date)
@@ -47,13 +54,17 @@ def crawler(pd):
             sku = "%s:%s" % (pd.site_id, matches)
             print "sku: %s" % (sku)
         print "scraping entry: %s, url: %s, author: %s" % (l_title, url, authors[0])
-        print "created on %s" % (c_date)
+        if get_date:
+            print "created on %s" % (c_date)
         if get_edit_date:
             print "edited on %s" % (e_date)
+  
+
+
 
         #database stuff
         try:
-            date = current_date(get_date, get_edit_date, pd.date_regex)
+            date = current_date(get_date, get_edit_date, pd.date_regex, pd.site_id)
             print "extracting post id for sku..."
             if matches:
                 print "extraction successful!!"
@@ -68,8 +79,8 @@ def crawler(pd):
             #pdp = ProcessDataPosts(posts, authors, pd.site_id, date)
             #check_update_post(my_list, site_id, url, sku, l_title, pdp)
 
-        except Exception, (ErrorNumber, ErrorMessage):
-            print "something went wrong! rolling back table! LINE: %s and ERROR: %s" % (str(ErrorNumber), str(ErrorMessage))
+        except Exception, err:
+            print "something went wrong! rolling back table! ERROR: %s" % (str(err))
             sql_db.rollback()
             sys.exit()
 
@@ -144,7 +155,6 @@ def is_list_starter(post_id, thread_author, author):
 
     return check
 
-
 def define_link(links, reform_url_flag): 
     if reform_url_flag: 
         link_url = links.url
@@ -179,74 +189,25 @@ class ProcessDataPosts(object):
 
         return storage
 
-
 def fine_tune_urls(storage_list, regex):
     return [i for i in storage_list if re.compile(regex).findall(i.url)]
 
-def current_date(get_date, get_edit_date, date_regex):
+def current_date(get_date, get_edit_date, date_regex, site_id):
 
     if get_date and get_edit_date is None:
         post_date = re.compile(date_regex).findall(get_date) 
 
     if get_edit_date:
         post_date = re.compile(date_regex).findall(get_edit_date) 
+    
+    if site_id is 'MLPH':
+        if get_date == 'Today' or get_edit_date == 'Today':
+            return date.today().isoformat()
+        
+        if get_date == 'Yesterday' or get_edit_date == 'Yesterday':
+            yesterday = date.today() - timedelta(1)
+            return yesterday.isoformat()
+
+        post_date = re.compile(date_regex).findall(get_date) 
 
     return parser.parse(post_date[0]).date().isoformat()
-
-def test_crawler(storage_list, **keywords):
-
-    site_id = sql_db.site.filter(sql_db.site.site_nm==keywords['site_id']).first()
-    br = keywords['mecha_state']
-
-    print "processing list views..."
-    for links in storage_list:
-        br.follow_link(links)
-        d = pq(br.response().read()) 
-
-        posts = d(keywords['content']).map(lambda i, e: (pq(e).text(), pq(e).html()))
-        authors = d(keywords['author']).map(lambda i, e: pq(e).text())
-        post_data = process_post_data(posts, authors, keywords['site_id'])
-        linky = links.text
-
-        print links.url
-
-        l_title = unicode(linky, 'latin-1').encode('utf-8')
-
-        (matches, ) = re.compile(keywords['post_regex']).findall(links.url)
-        if keywords['reform_url']: 
-            link_url = links.url
-            reformed_url = link_url.split('./')[1]
-            url = "http://grupotoyota.com.ph/board/%s" % (reformed_url)
-        else:
-            url = links.url
-
-        print "---------------------------------------------------"
-        if matches:
-            site_id = keywords['site_id']
-            sku = "%s:%s" % (site_id, matches) 
-            print "sku: %s" % (sku)
-        print "scraping entry: %s, url: %s" % (l_title, url)
-
-        for i in post_data.keys():
-            for idx, p in enumerate(data.getall(i)):
-                print idx, i, p
-        
-        #"""
-        #Hmmmm let us see if the site is JDMU or any other car forum that has multiple forum subposts... 
-        #"""
-        #extra_links = None
-        #if keywords['site_id'] is 'JDMU':
-        #    (extra_links ,) = d('a[title="Jump to page..."]').eq(1).parents('td').eq(1).map(lambda i, e: re.compile('\([0-9]\)').findall(td.pq(e).text()))
-        #    for i in range(1, int(extra_links[1]) + 1):
-        #        print i
-        #    
-        #    extra_links_cnt = int(extra_links[1])
-
-        #   while(extra_links_cnt):
-        #                
-        #               
-        #              
-        #       pass
-        #       extra_links_cnt -= 1
-        #       br.back()
-        #br.back()

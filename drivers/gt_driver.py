@@ -1,7 +1,7 @@
 import mechanize, urllib
 import cookielib, re
 from pyquery import PyQuery as pq
-from dataprocess import crawler, test_crawler
+from dataprocess import crawler
 from PageData import PageData
 
 url = "http://grupotoyota.com.ph/board/"
@@ -18,9 +18,7 @@ br['password'] = 'p455w0rd'
 br.submit()
 
 print "login in successful!"
-
 html = pq(br.response().read())
-
 processing = True
 
 post_content = 'div.postbody'
@@ -40,7 +38,6 @@ while(processing):
     print "going to Auto parts Selling..."
 
     if page is 1:
-
         (selling_link ,)= html('a[href*="./viewforum.php?f=8"]').map(lambda i, e: pq(e).attr('href')) 
         req = br.find_link(url=selling_link)
         res = br.follow_link(req)
@@ -57,7 +54,6 @@ while(processing):
                  .with_site_id(site_id).if_reform_url(True)
 
         crawler(pd)
-
         page += 1
         br.back()
     else:
@@ -80,5 +76,4 @@ while(processing):
         if(nxt_pge_cnt == end_pge_cnt):
             processing = False
 
-        br.back()
- 
+        br.back() 
