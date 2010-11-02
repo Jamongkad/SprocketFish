@@ -1,7 +1,7 @@
 from sqlalchemy.ext.sqlsoup import SqlSoup
 
 import mechanize, urllib
-import cookielib, re, sys
+import cookielib, re, sys, os
 from pyquery import PyQuery as pq
 import MultiDict
 from dateutil import parser
@@ -59,9 +59,6 @@ def crawler(pd):
         if get_edit_date:
             print "edited on %s" % (e_date)
   
-
-
-
         #database stuff
         try:
             date = current_date(get_date, get_edit_date, pd.date_regex, pd.site_id)
@@ -76,8 +73,8 @@ def crawler(pd):
                 print "failure in sku extraction..."
                 sys.exit()   
 
-            #pdp = ProcessDataPosts(posts, authors, pd.site_id, date)
-            #check_update_post(my_list, site_id, url, sku, l_title, pdp)
+            pdp = ProcessDataPosts(posts, authors, pd.site_id, date)
+            check_update_post(my_list, site_id, url, sku, l_title, pdp)
 
         except Exception, err:
             print "something went wrong! rolling back table! ERROR: %s" % (str(err))
@@ -85,9 +82,7 @@ def crawler(pd):
             sys.exit()
 
         br.back()
-
-    print "processing done!"
-
+    
 def check_update_post(my_list, site_id, url, sku, l_title, data_obj):
 
     post_data = data_obj.process_post_data()

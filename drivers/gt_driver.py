@@ -3,6 +3,7 @@ import cookielib, re
 from pyquery import PyQuery as pq
 from dataprocess import crawler
 from PageData import PageData
+from log_writer import log_message
 
 url = "http://grupotoyota.com.ph/board/"
 br = mechanize.Browser(factory=mechanize.RobustFactory())  
@@ -55,6 +56,7 @@ while(processing):
 
         crawler(pd)
         page += 1
+        #log_message('gt-driver_%d' % (page)) 
         br.back()
     else:
         next_page_url = "http://grupotoyota.com.ph/board/viewforum.php?f=8&start=%s" % (nxt_pge_cnt)
@@ -76,4 +78,5 @@ while(processing):
         if(nxt_pge_cnt == end_pge_cnt):
             processing = False
 
+        #log_message('gt-driver_%d' % nxt_pge_cnt) 
         br.back() 
