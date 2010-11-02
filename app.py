@@ -7,7 +7,7 @@ from forms import LoginAccountForm, CreateAccountForm
 from myrequest import Request
 from SprocketAuth import SprocketAuth
 
-from db import User, Job, session, sql_db as db
+from db import sql_db as db
 
 import welcome, site_admin, masthead, header, job, parts
 

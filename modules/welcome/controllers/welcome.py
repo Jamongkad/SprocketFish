@@ -4,7 +4,7 @@ import web
 from sqlalchemy import or_, and_, desc
 from view import render
 from forms import AddJob
-from db import User, Job, session, sql_db as db
+from db import sql_db as db
 from myrequest import Request
 
 from mx.DateTime import DateTime

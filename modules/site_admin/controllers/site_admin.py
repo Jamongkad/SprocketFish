@@ -6,7 +6,7 @@ from view import render
 from forms import ChooseOccup
 from myrequest import Request
 
-from db import User, Job, session, sql_db as db
+from db import sql_db as db
 from forms import LoginAccountForm, CreateAccountForm
 
 urls = (

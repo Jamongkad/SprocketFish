@@ -205,6 +205,12 @@ a {
     color: #CC99CC;
     font-size: 19px;
     text-transform: none;
+    float: left;
+    padding-right: 4px;
+}
+
+.date {
+
 }
 
 .post_title {

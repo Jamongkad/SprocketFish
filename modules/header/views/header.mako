@@ -4,8 +4,8 @@ ${logged_in}
 -->
 <div id="nav_holder">
     <ul class="sprocket_nav">
-        <li><strong><a href="/">What's Hot?</a></strong></li>
-        <li><strong><a href="/">New</a></strong></li>
+        <li><strong><a href="/">Search</a></strong></li>
+        <li><strong><a href="/">Browse</a></strong></li>
         <!--<li><strong><a href="/">Tools</a></strong></li>-->
     </ul>
 

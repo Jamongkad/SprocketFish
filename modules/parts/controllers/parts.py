@@ -8,7 +8,7 @@ from myrequest import Request
 import nltk, itertools, string, MultiDict, pprint
 
 
-from db import User, Job, session, sql_db as db
+from db import sql_db as db
 import sphinxapi 
 urls = (
     '/search', 'search',
@@ -84,6 +84,7 @@ class view(object):
                 data_prep.list_title AS title
               , listings_posts.list_text_html AS html
               , listings_posts.list_author AS auth
+              , DATE_FORMAT(data_prep.list_date, GET_FORMAT(DATE, 'USA')) AS date
             FROM 
                 data_prep
             INNER JOIN
