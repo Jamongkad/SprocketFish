@@ -12,7 +12,6 @@
         </form>
     </div>  
     <p style="height: 30px"></p>
-    <%! import re, nltk %>
     <div id="search_results" class="prefix_1">
         % for d in rp:
             <div class="crd1 cl1 suffix_2">
