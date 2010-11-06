@@ -14,7 +14,7 @@ urls = (
     '/search', 'search',
     '/view/(.*)', 'view',
     '/sortby/(.*)', 'sortby',
-    '/browse', 'browse'
+    '/browse/(.*)', 'browse'
 )
 
 app = web.application(urls, globals(), autoreload=True)
@@ -82,11 +82,54 @@ class sortby(object):
         return rp.fetchall()
 
 class browse(object):
-    def GET(self):
-        from pagination import Pagination
-        pg = Pagination(15, 100, '/parts/browse_view')
-        return pg.buildLinks()
-        #import datetime
+    def GET(self, cur):
+        from paginate import Pageset
+        import datetime
+
+        current_page = int(cur)
+
+        sql = """
+            SELECT 
+                SQL_CALC_FOUND_ROWS
+                list_date
+            FROM 
+                data_prep 
+            WHERE 1=1
+                AND DATE_FORMAT(list_date, '%%Y') = "2010"
+            GROUP BY 
+                list_date 
+            ORDER BY
+                list_date DESC
+        """
+        db.bind.execute(sql)  
+        
+        sql = """SELECT FOUND_ROWS() as foundRows"""
+
+        res = db.bind.execute(sql)
+        total_entries = res.fetchall()[0][0]
+        pg = Pageset(total_entries, 6)
+        pg.current_page(current_page)
+        date_sql = """
+            SELECT 
+                list_date
+            FROM 
+                data_prep 
+            WHERE 1=1
+                AND DATE_FORMAT(list_date, '%s') = "2010"
+            GROUP BY 
+                list_date 
+            ORDER BY
+                list_date DESC
+            LIMIT %d, %d
+        """ % ('%%Y', pg.skipped() ,pg.entries_per_page())
+        fin_res = db.bind.execute(date_sql)  
+        dates_result = fin_res.fetchall()
+        pages = pg.pages_in_set()
+        first = pg.first_page()
+        last  = pg.last_page()
+        
+        return render('browse_view.mako', pages=pages, dates_result=dates_result, first=first, last=last, current_page=current_page) 
+ 
         #sk = SkuInfo()
         #sql = """
         #    SELECT 
