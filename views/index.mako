@@ -10,7 +10,7 @@
             <input type="text" name="searchd" value="" id="search_box" />
             <input type="submit" value="search" id="search_btn"/>
         </form>
-        <p id="desc_text">SprocketFish is an auto enthusiast powered search engine.</p>
+        <p id="desc_text">GearFish is an auto enthusiast powered search engine.</p>
     </div> 
     <center>
     <p id="category_text">Browse by Forum Source</p>
@@ -18,7 +18,7 @@
     <table>
         <tr>
             % for site in sites:
-                <td id="forum_node"><a href="/parts/sortby/${site.site_nm}">${site.site_nm}</a></td> 
+                <td id="forum_node"><a href="/parts/browse?pg=1&sl=${site.site_nm}">${site.site_nm}</a></td> 
             % endfor
         </tr>
     </table>
