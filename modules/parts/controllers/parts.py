@@ -14,10 +14,14 @@ import datetime, MultiDict
 
 from db import sql_db as db
 import sphinxapi 
+
+import parts_model
+
 urls = (
     '/search', 'search',
     '/view/(.*)', 'view',
-    '/browse', 'browse'
+    '/browse', 'browse',
+    '/test', 'test'
 )
 
 app = web.application(urls, globals(), autoreload=True)
@@ -65,17 +69,29 @@ class view(object):
 class browse(object):
     def GET(self):
         u = web.input()
-        pg, sl = u['pg'] if 'pg' in u else None, u['sl'] if 'sl' in u else None 
+        pg, sl, with_img = u['pg'] if 'pg' in u else None, u['sl'] if 'sl' in u else None, u['with_img'] if 'with_img' in u else None
 
         current_page = int(pg) 
-        sites = ["'HCP'", "'GT'", "'JDMU'", "'MLPH'"]
+        sites_for_now = parts_model.Sites().show_sites() 
 
-        if sl != None:
-            sites = []
+        if sl:
+            new_sites = []
             for site in sl.split(","):
-                sites.append("'%s'" % site)
-         
-        site_select = ",".join(sites)
+                new_sites.append("'%s'" % site)
+
+            sites_for_now = new_sites
+                       
+        site_select = ",".join(sites_for_now)
+
+        img_post_ids = ''
+        if with_img:
+            sk = SkuInfo()
+            sk.cl.SetLimits(0, 1000)
+            res = sk.cl.Query('.jpg')
+            img_post = [("'%s'" % i['id']) for i in res['matches']]
+            img_post_ids = "AND SUBSTRING_INDEX( SUBSTRING_INDEX(listings_posts.idlistings_posts, ':', 2), ':', -1) IN (" + ",".join(img_post) + ")"
+
+        values = {'year': '%%Y', 'site_select': site_select, 'img': img_post_ids}
 
         sql = """
             SELECT 
@@ -83,12 +99,16 @@ class browse(object):
                 list_title 
             FROM 
                 data_prep 
+            INNER JOIN
+                listings_posts
+                    ON data_prep.list_sku = listings_posts.list_sku
             WHERE 1=1
-                AND DATE_FORMAT(list_date, '%s') = "2010"
-                AND SUBSTRING_INDEX(data_prep.list_sku, ":", 1) IN (%s)
+                AND DATE_FORMAT(list_date, '%(year)s') = "2010"
+                AND SUBSTRING_INDEX(data_prep.list_sku, ":", 1) IN (%(site_select)s)
+                %(img)s
             GROUP BY 
                 list_title 
-        """ % ('%%Y', site_select)
+        """ % (values)
         db.bind.execute(sql)  
         
         sql = """SELECT FOUND_ROWS() as foundRows"""
@@ -112,64 +132,64 @@ class browse(object):
                     AND listings_posts.list_starter = 1 
                     AND DATE_FORMAT(list_date, '%s') = "2010" 
                     AND SUBSTRING_INDEX(data_prep.list_sku, ":", 1) IN (%s)
+                    %s
                 GROUP BY
                     title
                 ORDER BY
                     list_date DESC
                 LIMIT %d, %d
-                """ % ('%%Y', site_select, pg.skipped(), pg.entries_per_page())
+                """ % ('%%Y', site_select, img_post_ids,  pg.skipped(), pg.entries_per_page())
 
         date_result = db.bind.execute(date_sql).fetchall()
         pages = pg.pages_in_set()
         first = pg.first_page()
         last  = pg.last_page()          
+        
+        sites_alpha = parts_model.Sites().show_sites(with_quotes=False) 
+        chosen = []
+        if sl:
+            chosen = sl.split(',')                    
+        
+        if chosen != None:
+            remaining = filter(lambda x : x not in chosen, sites_alpha)
+        else:
+            remaining = sites_alpha
+
+        selected = filter(lambda x : x in chosen, sites_alpha)
+        
+        if len(selected) == 1 or len(selected) == 0:
+            connect_str = ""
+        else:
+            connect_str = "&sl=" 
+
+        if with_img:
+            img_str = "&with_img=1"
+        else:
+            img_str = ""
+
+        if len(selected) > 0:
+            img_str_sl = "&sl="
+        else:
+            img_str_sl = ""
              
         d = OrderedDict()
         for i in date_result:
             d.setdefault(i[0], [])
             d[i[0]].append((i[1], i[2]))
 
-        return render('browse_view.mako', pages=pages, date_result=d, first=first, last=last, current_page=current_page, sl=sl)  
-       
+        return render('browse_view.mako', pages=pages, date_result=d, first=first, 
+                      last=last, current_page=current_page, sl=sl, with_img=with_img,
+                      chosen=chosen, remaining=remaining, selected=selected, connect_str=connect_str, img_str_sl=img_str_sl, img_str=img_str)  
+
+class test(object):
+    def GET(self):
+        sk = SkuInfo()
+        sk.cl.SetLimits(0, 1000)
+        res = sk.cl.Query('.jpg|img')
+        img_post = [("'%s'" % i['id']) for i in res['matches']]
+        img_post_ids = ",".join(img_post)
+        return img_post_ids
+
 
 def matrank(weight, num_of_photos):
     return weight + num_of_photos * 0.00001
-
-
-#date_sql = """
-#    SELECT 
-#        list_date
-#      , ds.title
-#      , ds.sku
-#      , ds.post_id
-#    FROM 
-#        data_prep AS dp
-#    INNER JOIN ( 
-#        SELECT 
-#            SUBSTRING_INDEX( SUBSTRING_INDEX(listings_posts.idlistings_posts, ':', 2), ':', -1) AS post_id
-#          , data_prep.list_title AS title
-#          , listings_posts.idlistings_posts AS list_id
-#          , data_prep.list_sku AS sku
-#          , listings_posts.list_text_text AS text
-#          , listings_posts.list_text_html AS html
-#          , listings_posts.list_author AS auth
-#          , data_prep.list_date AS date
-#          , SUBSTRING_INDEX(data_prep.list_sku, ":", 1) AS site_id
-#        FROM 
-#            data_prep
-#        INNER JOIN
-#            listings_posts
-#            ON data_prep.list_sku = listings_posts.list_sku
-#        WHERE 1=1
-#            AND listings_posts.list_starter = 1 
-#    ) AS ds
-#        ON ds.date = dp.list_date
-#    WHERE 1=1
-#        AND DATE_FORMAT(list_date, '%s') = "2010" 
-#        AND ds.site_id IN (%s)
-#    GROUP BY 
-#        ds.title 
-#    ORDER BY
-#        list_date DESC
-#    LIMIT %d, %d
-#""" % ('%%Y', site_select, pg.skipped(), pg.entries_per_page())
