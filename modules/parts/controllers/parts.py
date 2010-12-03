@@ -12,14 +12,14 @@ from paginate import Pageset
 from ordereddict import OrderedDict
 import datetime, MultiDict 
 
-from db import sql_db as db
+from db import sql_db as db, text
 import sphinxapi 
 
 import parts_model
 
 urls = (
     '/search', 'search',
-    '/view/(.*)', 'view',
+    '/view', 'view',
     '/browse', 'browse',
     '/test', 'test'
 )
@@ -46,8 +46,11 @@ class search(object):
         return render('search_results.mako', rp=ids_list, search_term=search_query)
     
 class view(object):
-    def GET(self, list_id):
-        sql = """
+    def GET(self):
+        u = web.input()   
+        pg, sl, with_img = u['pg'] if 'pg' in u else None, u['sl'] if 'sl' in u else None, u['with_img'] if 'with_img' in u else None
+
+        sql = text("""
             SELECT   
                 data_prep.list_title AS title
               , listings_posts.list_text_html AS html
@@ -59,12 +62,11 @@ class view(object):
                 listings_posts
                 ON data_prep.list_sku = listings_posts.list_sku
             where 1=1 
-                AND data_prep.list_sku = '%s'
+                AND data_prep.list_sku = :x
                 AND listings_posts.list_starter = 1 
-        """ % (list_id) 
-        rp = db.bind.execute(sql)
-        return render('part_view.mako', rp=rp.fetchall())
-
+        """) 
+        rp = db.bind.execute(sql, x=u['list_id'])
+        return render('part_view.mako', rp=rp.fetchall(), pg=pg, sl=sl, with_img=with_img)
 
 class browse(object):
     def GET(self):
@@ -111,7 +113,7 @@ class browse(object):
         """ % (values)
         db.bind.execute(sql)  
         
-        sql = """SELECT FOUND_ROWS() as foundRows"""
+        sql = text("""SELECT FOUND_ROWS() as foundRows""")
 
         res = db.bind.execute(sql)
         total_entries = res.fetchall()[0][0]
@@ -130,15 +132,15 @@ class browse(object):
                     ON data_prep.list_sku = listings_posts.list_sku
                 WHERE 1=1
                     AND listings_posts.list_starter = 1 
-                    AND DATE_FORMAT(list_date, '%s') = "2010" 
-                    AND SUBSTRING_INDEX(data_prep.list_sku, ":", 1) IN (%s)
-                    %s
+                    AND DATE_FORMAT(list_date, '%(year)s') = "2010" 
+                    AND SUBSTRING_INDEX(data_prep.list_sku, ":", 1) IN (%(site_select)s)
+                    %(img)s
                 GROUP BY
                     title
                 ORDER BY
                     list_date DESC
-                LIMIT %d, %d
-                """ % ('%%Y', site_select, img_post_ids,  pg.skipped(), pg.entries_per_page())
+                LIMIT %(offset)i, %(limit)i
+                """ % ({'year': '%%Y', 'site_select': site_select, 'img': img_post_ids,  'offset': pg.skipped(), 'limit': pg.entries_per_page()})
 
         date_result = db.bind.execute(date_sql).fetchall()
         pages = pg.pages_in_set()

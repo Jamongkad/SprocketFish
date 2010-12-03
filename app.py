@@ -31,8 +31,7 @@ sa = SprocketAuth(app)
 
 class index(object):
     def GET(self):
-        sql = """SELECT * FROM site"""
-        sites = db.bind.execute(sql)
+        sites = db.bind.execute("""SELECT * FROM site""")
         return render('index.mako', sites=sites)
 
 class create_account(object):

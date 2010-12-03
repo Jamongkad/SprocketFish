@@ -2,6 +2,7 @@ from sqlalchemy import create_engine, Table, Column, Integer, String, MetaData, 
 from sqlalchemy.orm import mapper, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.sqlsoup import SqlSoup
+from sqlalchemy.sql import text
 
 """
 please clean this up!
