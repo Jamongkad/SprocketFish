@@ -13,15 +13,19 @@
     </div>  
     <p style="height: 30px"></p>
     <div id="search_results" class="prefix_1">
-        % for d in rp:
-            <div class="crd1 cl1 suffix_2">
-                <div style="">
-                    <a class="l le" href="/parts/view/${d['sku']}">${unicode(d['title'], errors="ignore")}</a>
-                        <span id="brand"> ${d['sku'].split(":")[0]}</span></div> 
-                <div style="line-height: 1.4">
-                    ${d['excerpts'][0]}                   
+        % if rp:
+            % for d in rp:
+                <div class="crd1 cl1 suffix_2">
+                    <div style="">
+                        <a class="l le" href="/parts/view?list_id=${d['sku']}&searchd=${search_term}">${unicode(d['title'], errors="ignore")}</a>
+                            <span id="brand"> ${d['sku'].split(":")[0]}</span></div> 
+                    <div style="line-height: 1.4">
+                        ${d['excerpts'][0]}                   
+                    </div>
                 </div>
-            </div>
-        % endfor 
+            % endfor
+        % else:
+            <b>No results found...</b>
+        % endif
     </div>
 </div>

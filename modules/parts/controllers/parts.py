@@ -4,18 +4,16 @@ import web
 from pymongo import Connection
 from pymongo.objectid import ObjectId
 from view import render
-from myrequest import Request
-import nltk, itertools, string, MultiDict, pprint
 from SkuInfo import SkuInfo
 
 from paginate import Pageset
 from ordereddict import OrderedDict
-import datetime, MultiDict 
+import datetime
 
 from db import sql_db as db, text
 import sphinxapi 
 
-import parts_model
+import parts_model, redis, pickle
 
 urls = (
     '/search', 'search',
@@ -27,11 +25,13 @@ urls = (
 app = web.application(urls, globals(), autoreload=True)
 from SprocketAuth import SprocketAuth
 sa = SprocketAuth(app)
+r_server = redis.Redis("localhost")
 
 class search(object):
 
     def GET(self):
         u = web.input()
+        cache_time = 1800
         search_query = u['searchd']
 
         sk = SkuInfo()
@@ -39,16 +39,34 @@ class search(object):
 
         ids = res['matches']
         
-        ids_list = []
+        collected_ids = [str(i['id']) for i in ids]
+        id_select = ','.join(collected_ids)
+        
+        ids_list = None
         if ids: 
-            ids_list = [sk.sku_info(i['id'], search_query) for i in ids]
- 
+            if r_server.get("search_results:%s" % search_query):
+                print "from cache:search_results"
+                ids_list_redis = r_server.get("search_results:%s" % search_query)
+                ids_list = pickle.loads(ids_list_redis)
+            else: 
+                print "set cache:search_results"
+                ids_list = sk.sku_info(id_select, search_query)
+                ids_list_for_cache = pickle.dumps(ids_list)
+                r_server.set("search_results:%s" % search_query, ids_list_for_cache)
+
+        r_server.expire("search_results:%s" % search_query, cache_time)
+       
         return render('search_results.mako', rp=ids_list, search_term=search_query)
+
     
 class view(object):
     def GET(self):
         u = web.input()   
-        pg, sl, with_img = u['pg'] if 'pg' in u else None, u['sl'] if 'sl' in u else None, u['with_img'] if 'with_img' in u else None
+
+        pg   = 'pg=' + u['pg'] if 'pg' in u else ''
+        sl   = '&sl=' + u['sl'] if 'sl' in u else ''
+        img  = '&with_img=' + u['with_img'] if 'with_img' in u else ''
+        srch = u['searchd'] if 'searchd' in u else None
 
         sql = text("""
             SELECT   
@@ -66,11 +84,14 @@ class view(object):
                 AND listings_posts.list_starter = 1 
         """) 
         rp = db.bind.execute(sql, x=u['list_id'])
-        return render('part_view.mako', rp=rp.fetchall(), pg=pg, sl=sl, with_img=with_img)
+        return render('part_view.mako', rp=rp.fetchall(), pg=pg, sl=sl, img=img, srch=srch)
 
 class browse(object):
     def GET(self):
         u = web.input()
+
+        cache_time = 1800
+
         pg, sl, with_img = u['pg'] if 'pg' in u else None, u['sl'] if 'sl' in u else None, u['with_img'] if 'with_img' in u else None
 
         current_page = int(pg) 
@@ -141,8 +162,19 @@ class browse(object):
                     list_date DESC
                 LIMIT %(offset)i, %(limit)i
                 """ % ({'year': '%%Y', 'site_select': site_select, 'img': img_post_ids,  'offset': pg.skipped(), 'limit': pg.entries_per_page()})
+        
 
-        date_result = db.bind.execute(date_sql).fetchall()
+
+        if r_server.get("date_result"):
+            print "from cache:date_result"
+            date_result_redis = r_server.get("date_result")
+            date_result = pickle.loads(date_result_redis)
+        else:
+            print "set cache:date_result"
+            date_result = db.bind.execute(date_sql).fetchall()
+            date_pickle = pickle.dumps(date_result) 
+            r_server.set("date_result", date_pickle)
+          
         pages = pg.pages_in_set()
         first = pg.first_page()
         last  = pg.last_page()          
@@ -159,25 +191,32 @@ class browse(object):
 
         selected = filter(lambda x : x in chosen, sites_alpha)
         
-        if len(selected) == 1 or len(selected) == 0:
-            connect_str = ""
-        else:
-            connect_str = "&sl=" 
+        connect_str = "" if len(selected) == 1 or len(selected) == 0 else "&sl="
+        img_str = "&with_img=1" if with_img else ""
+        img_str_sl = "&sl=" if len(selected) > 0 else ""
 
-        if with_img:
-            img_str = "&with_img=1"
-        else:
-            img_str = ""
+        #d = OrderedDict()
+        #for i in date_result:
+        #    d.setdefault(i[0], [])
+        #    d[i[0]].append((i[1], i[2]))
+        if r_server.get("browse_data"):
+            print "from cache:browse_data"
+            browse_result_redis = r_server.get("browse_data")
+            d = pickle.loads(browse_result_redis)
+        else: 
+            print "set cache:browse_data"
+            d = OrderedDict()
+            for i in date_result:
+                d.setdefault(i[0], [])
+                d[i[0]].append((i[1], i[2]))
+            d_browse_data = pickle.dumps(d)
+            r_server.set("browse_data", d_browse_data)
 
-        if len(selected) > 0:
-            img_str_sl = "&sl="
-        else:
-            img_str_sl = ""
-             
-        d = OrderedDict()
-        for i in date_result:
-            d.setdefault(i[0], [])
-            d[i[0]].append((i[1], i[2]))
+        r_server.expire("date_result", cache_time)
+        r_server.expire("browse_data", cache_time)
+        
+        #r_server.delete("date_result")
+        #r_server.delete("browse_data")
 
         return render('browse_view.mako', pages=pages, date_result=d, first=first, 
                       last=last, current_page=current_page, sl=sl, with_img=with_img,

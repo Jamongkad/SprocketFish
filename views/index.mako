@@ -3,6 +3,12 @@
     GearFish 
 </%def>
 
+<script type="text/javascript">
+    $(function(){
+        $('input[name="searchd"]').focus();
+    })
+</script>
+
 <div style="text-align:center">
     <div id="title">Gear<span id="logo">Fish</span></div>       
     <div id="searchd">
