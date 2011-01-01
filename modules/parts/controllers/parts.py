@@ -13,7 +13,7 @@ import datetime
 from db import sql_db as db, text
 import sphinxapi 
 
-import parts_model, redis, pickle
+import parts_model, redis, cPickle
 
 urls = (
     '/search', 'search',
@@ -26,12 +26,13 @@ app = web.application(urls, globals(), autoreload=True)
 from SprocketAuth import SprocketAuth
 sa = SprocketAuth(app)
 r_server = redis.Redis("localhost")
+cache_timeout = 1800
+
 
 class search(object):
 
     def GET(self):
         u = web.input()
-        cache_time = 1800
         search_query = u['searchd']
 
         sk = SkuInfo()
@@ -47,14 +48,14 @@ class search(object):
             if r_server.get("search_results:%s" % search_query):
                 print "from cache:search_results"
                 ids_list_redis = r_server.get("search_results:%s" % search_query)
-                ids_list = pickle.loads(ids_list_redis)
+                ids_list = cPickle.loads(ids_list_redis)
             else: 
                 print "set cache:search_results"
                 ids_list = sk.sku_info(id_select, search_query)
-                ids_list_for_cache = pickle.dumps(ids_list)
+                ids_list_for_cache = cPickle.dumps(ids_list)
                 r_server.set("search_results:%s" % search_query, ids_list_for_cache)
 
-        r_server.expire("search_results:%s" % search_query, cache_time)
+        r_server.expire("search_results:%s" % search_query, cache_timeout)
        
         return render('search_results.mako', rp=ids_list, search_term=search_query)
 
@@ -89,9 +90,6 @@ class view(object):
 class browse(object):
     def GET(self):
         u = web.input()
-
-        cache_time = 1800
-
         pg, sl, with_img = u['pg'] if 'pg' in u else None, u['sl'] if 'sl' in u else None, u['with_img'] if 'with_img' in u else None
 
         current_page = int(pg) 
@@ -138,6 +136,17 @@ class browse(object):
 
         res = db.bind.execute(sql)
         total_entries = res.fetchall()[0][0]
+        
+        total_entries_select_key = "foundrows:%s" % (":".join(sites_for_now))
+        total_entries_redis = r_server.sismember(total_entries_select_key, cPickle.dumps(total_entries))
+
+        if total_entries_redis:
+            print "cache_hit:browsedate-foundrows:retrieve"
+            total_entries = cPickle.loads(r_server.smembers(total_entries_select_key).pop())
+        else:
+            print "cache_hit:browsedate-foundrows:set"
+            r_server.sadd(total_entries_select_key, cPickle.dumps(total_entries))
+
         pg = Pageset(total_entries, 100)
         pg.current_page(current_page)
         date_sql = """
@@ -161,20 +170,23 @@ class browse(object):
                 ORDER BY
                     list_date DESC
                 LIMIT %(offset)i, %(limit)i
-                """ % ({'year': '%%Y', 'site_select': site_select, 'img': img_post_ids,  'offset': pg.skipped(), 'limit': pg.entries_per_page()})
-        
+                """ % ({'year': '%%Y', 'site_select': site_select, 'img': img_post_ids,  'offset': pg.skipped(), 'limit': pg.entries_per_page()}) 
 
+        option_select_key = "%s:%s:%s" % (":".join(sites_for_now), pg.skipped(), pg.entries_per_page())
+        option_select_key_browse = "%s:%s:%s:browse" % (":".join(sites_for_now), pg.skipped(), pg.entries_per_page())
 
-        if r_server.get("date_result"):
-            print "from cache:date_result"
-            date_result_redis = r_server.get("date_result")
-            date_result = pickle.loads(date_result_redis)
+        date_result_query_object = db.bind.execute(date_sql).fetchall()
+
+        date_result_redis = r_server.sismember(option_select_key, cPickle.dumps(date_result_query_object))
+
+        if date_result_redis:
+            print "cache_hit:browsedata:retrieve"
+            date_result = cPickle.loads(r_server.smembers(option_select_key).pop())
         else:
-            print "set cache:date_result"
-            date_result = db.bind.execute(date_sql).fetchall()
-            date_pickle = pickle.dumps(date_result) 
-            r_server.set("date_result", date_pickle)
-          
+            print "cache_hit:browsedata:set"
+            date_result = date_result_query_object
+            r_server.sadd(option_select_key, cPickle.dumps(date_result))
+ 
         pages = pg.pages_in_set()
         first = pg.first_page()
         last  = pg.last_page()          
@@ -194,29 +206,23 @@ class browse(object):
         connect_str = "" if len(selected) == 1 or len(selected) == 0 else "&sl="
         img_str = "&with_img=1" if with_img else ""
         img_str_sl = "&sl=" if len(selected) > 0 else ""
+ 
+        d = OrderedDict()
+        for i in date_result:
+            d.setdefault(i[0], [])
+            d[i[0]].append((i[1], i[2]))
 
-        #d = OrderedDict()
-        #for i in date_result:
-        #    d.setdefault(i[0], [])
-        #    d[i[0]].append((i[1], i[2]))
-        if r_server.get("browse_data"):
-            print "from cache:browse_data"
-            browse_result_redis = r_server.get("browse_data")
-            d = pickle.loads(browse_result_redis)
+        if r_server.sismember(option_select_key_browse, cPickle.dumps(d)):
+            print "cache_hit:browsedata-browse:retrieve"
+            d = cPickle.loads(r_server.smembers(option_select_key_browse).pop())
         else: 
-            print "set cache:browse_data"
-            d = OrderedDict()
-            for i in date_result:
-                d.setdefault(i[0], [])
-                d[i[0]].append((i[1], i[2]))
-            d_browse_data = pickle.dumps(d)
-            r_server.set("browse_data", d_browse_data)
+            print "cache_hit:browsedata-browse:set"
+            r_server.sadd(option_select_key_browse, cPickle.dumps(d))
 
-        r_server.expire("date_result", cache_time)
-        r_server.expire("browse_data", cache_time)
-        
-        #r_server.delete("date_result")
-        #r_server.delete("browse_data")
+        r_server.expire(option_select_key, cache_timeout)        
+        r_server.expire(option_select_key_browse, cache_timeout)        
+        #r_server.delete(option_select_key)
+        #r_server.delete(option_select_key_browse)
 
         return render('browse_view.mako', pages=pages, date_result=d, first=first, 
                       last=last, current_page=current_page, sl=sl, with_img=with_img,
@@ -230,7 +236,6 @@ class test(object):
         img_post = [("'%s'" % i['id']) for i in res['matches']]
         img_post_ids = ",".join(img_post)
         return img_post_ids
-
 
 def matrank(weight, num_of_photos):
     return weight + num_of_photos * 0.00001
