@@ -8,7 +8,7 @@ ${logged_in}
         <li><strong><a href="/parts/browse?pg=1">Browse</a></strong></li>
     </ul>
     
-
+    <!--
     <ul class="nav">
         % if not logged_in:
             <li><strong><a href="/site/sa/login">Login</a></strong></li>
@@ -21,4 +21,5 @@ ${logged_in}
             </li>
         % endif        
     </ul>
+    -->
 </div>

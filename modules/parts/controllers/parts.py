@@ -28,7 +28,6 @@ sa = SprocketAuth(app)
 r_server = redis.Redis("localhost")
 cache_timeout = 1800
 
-
 class search(object):
 
     def GET(self):
@@ -112,20 +111,19 @@ class browse(object):
             img_post = [("'%s'" % i['id']) for i in res['matches']]
             img_post_ids = "AND SUBSTRING_INDEX( SUBSTRING_INDEX(listings_posts.idlistings_posts, ':', 2), ':', -1) IN (" + ",".join(img_post) + ")"
 
-        values = {'year': '%%Y', 'site_select': site_select, 'img': img_post_ids}
+        values = {'site_select': site_select, 'img': img_post_ids}
 
         sql = """
             SELECT 
                 SQL_CALC_FOUND_ROWS
                 list_title 
             FROM 
-                data_prep 
+                data_prep AS dp
             INNER JOIN
-                listings_posts
-                    ON data_prep.list_sku = listings_posts.list_sku
+                listings_posts AS lp
+                    ON lp.list_sku = dp.list_sku 
             WHERE 1=1
-                AND DATE_FORMAT(list_date, '%(year)s') = "2010"
-                AND SUBSTRING_INDEX(data_prep.list_sku, ":", 1) IN (%(site_select)s)
+                AND SUBSTRING_INDEX(dp.list_sku, ":", 1) IN (%(site_select)s)
                 %(img)s
             GROUP BY 
                 list_title 
@@ -134,58 +132,62 @@ class browse(object):
         
         sql = text("""SELECT FOUND_ROWS() as foundRows""")
 
-        res = db.bind.execute(sql)
-        total_entries = res.fetchall()[0][0]
-        
         total_entries_select_key = "foundrows:%s" % (":".join(sites_for_now))
-        total_entries_redis = r_server.sismember(total_entries_select_key, cPickle.dumps(total_entries))
-
-        if total_entries_redis:
+        if r_server.get(total_entries_select_key): 
             print "cache_hit:browsedate-foundrows:retrieve"
-            total_entries = cPickle.loads(r_server.smembers(total_entries_select_key).pop())
-        else:
+            total_entries = cPickle.loads(r_server.get(total_entries_select_key))
+        else: 
             print "cache_hit:browsedate-foundrows:set"
-            r_server.sadd(total_entries_select_key, cPickle.dumps(total_entries))
-
-        pg = Pageset(total_entries, 100)
+            res = db.bind.execute(sql)
+            total_entries = res.fetchall()[0][0]
+            r_server.set(total_entries_select_key, cPickle.dumps(total_entries))
+       
+        pg = Pageset(total_entries, 50)
         pg.current_page(current_page)
         date_sql = """
                 SELECT 
-                    data_prep.list_date AS list_date
-                  , data_prep.list_title AS title
-                  , data_prep.list_sku AS sku 
-                  , SUBSTRING_INDEX( SUBSTRING_INDEX(listings_posts.idlistings_posts, ':', 2), ':', -1) AS post_id
+                    dp.list_date AS list_date
+                  , dp.list_title AS title
+                  , dp.list_sku AS sku 
+                  , SUBSTRING_INDEX( SUBSTRING_INDEX(lp.idlistings_posts, ':', 2), ':', -1) AS post_id
                 FROM 
-                    data_prep
+                    (SELECT 
+                         list_sku 
+                       , list_title
+                       , list_date
+                     FROM 
+                         data_prep
+                     WHERE 1=1
+                         AND SUBSTRING_INDEX(list_sku, ":", 1) IN (%(site_select)s)
+                    ) AS dp
                 INNER JOIN
-                    listings_posts
-                    ON data_prep.list_sku = listings_posts.list_sku
+                    (SELECT
+                         idlistings_posts
+                       , list_sku
+                       , list_starter
+                     FROM
+                         listings_posts
+                     WHERE 1=1
+                         AND list_starter = 1 
+                    ) AS lp
+                        ON lp.list_sku = dp.list_sku 
                 WHERE 1=1
-                    AND listings_posts.list_starter = 1 
-                    AND DATE_FORMAT(list_date, '%(year)s') = "2010" 
-                    AND SUBSTRING_INDEX(data_prep.list_sku, ":", 1) IN (%(site_select)s)
                     %(img)s
-                GROUP BY
-                    title
                 ORDER BY
                     list_date DESC
                 LIMIT %(offset)i, %(limit)i
-                """ % ({'year': '%%Y', 'site_select': site_select, 'img': img_post_ids,  'offset': pg.skipped(), 'limit': pg.entries_per_page()}) 
+                """ % ({'site_select': site_select, 'img': img_post_ids,  'offset': pg.skipped(), 'limit': pg.entries_per_page()}) 
 
         option_select_key = "%s:%s:%s" % (":".join(sites_for_now), pg.skipped(), pg.entries_per_page())
         option_select_key_browse = "%s:%s:%s:browse" % (":".join(sites_for_now), pg.skipped(), pg.entries_per_page())
 
-        date_result_query_object = db.bind.execute(date_sql).fetchall()
-
-        date_result_redis = r_server.sismember(option_select_key, cPickle.dumps(date_result_query_object))
-
-        if date_result_redis:
-            print "cache_hit:browsedata:retrieve"
-            date_result = cPickle.loads(r_server.smembers(option_select_key).pop())
+        if r_server.get(option_select_key): 
+            print "cache_hit:browsedata-date:retrieve"
+            date_result = cPickle.loads(r_server.get(option_select_key))
         else:
-            print "cache_hit:browsedata:set"
-            date_result = date_result_query_object
-            r_server.sadd(option_select_key, cPickle.dumps(date_result))
+            print "cache_hit:browsedata-date:set"
+            date_result = db.bind.execute(date_sql).fetchall()
+            r_server.set(option_select_key, cPickle.dumps(date_result))
  
         pages = pg.pages_in_set()
         first = pg.first_page()
@@ -206,23 +208,26 @@ class browse(object):
         connect_str = "" if len(selected) == 1 or len(selected) == 0 else "&sl="
         img_str = "&with_img=1" if with_img else ""
         img_str_sl = "&sl=" if len(selected) > 0 else ""
- 
-        d = OrderedDict()
-        for i in date_result:
-            d.setdefault(i[0], [])
-            d[i[0]].append((i[1], i[2]))
 
-        if r_server.sismember(option_select_key_browse, cPickle.dumps(d)):
+        if r_server.get(option_select_key_browse): 
             print "cache_hit:browsedata-browse:retrieve"
-            d = cPickle.loads(r_server.smembers(option_select_key_browse).pop())
-        else: 
+            d = cPickle.loads(r_server.get(option_select_key_browse))
+        else:
             print "cache_hit:browsedata-browse:set"
-            r_server.sadd(option_select_key_browse, cPickle.dumps(d))
-
+            d = OrderedDict()
+            for i in date_result:
+                d.setdefault(i[0], [])
+                d[i[0]].append((i[1], i[2]))
+            r_server.set(option_select_key_browse, cPickle.dumps(d))
+        
+  
         r_server.expire(option_select_key, cache_timeout)        
         r_server.expire(option_select_key_browse, cache_timeout)        
+        r_server.expire(total_entries_select_key, cache_timeout)
+
         #r_server.delete(option_select_key)
         #r_server.delete(option_select_key_browse)
+        #r_server.delete(total_entries_select_key)
 
         return render('browse_view.mako', pages=pages, date_result=d, first=first, 
                       last=last, current_page=current_page, sl=sl, with_img=with_img,

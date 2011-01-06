@@ -25,12 +25,11 @@ class SkuInfo(object):
                 listings_posts
                 ON data_prep.list_sku = listings_posts.list_sku
             WHERE 1=1 
-                AND DATE_FORMAT(data_prep.list_date, '%(year)s') = "2010"
                 AND SUBSTRING_INDEX( SUBSTRING_INDEX(listings_posts.idlistings_posts, ':', 2), ':', -1) IN (%(ids)s) 
                 AND listings_posts.list_starter = 1 
             ORDER BY
                 data_prep.list_date DESC
-            """ % ({'year': '%%Y', 'ids': ids})
+            """ % ({'ids': ids})
 
         rp = db.bind.execute(sql)
 
