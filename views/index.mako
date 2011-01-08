@@ -12,7 +12,7 @@
 <div style="text-align:center">
     <div id="title">Gear<span id="logo">Fish</span></div>       
     <div id="searchd">
-        <form method="GET" action="/parts/search">
+        <form method="GET" action="/parts/search" id="searchform">
             <input type="text" name="searchd" value="" id="search_box" />
             <input type="submit" value="search" id="search_btn"/>
         </form>

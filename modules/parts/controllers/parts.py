@@ -26,13 +26,16 @@ app = web.application(urls, globals(), autoreload=True)
 from SprocketAuth import SprocketAuth
 sa = SprocketAuth(app)
 r_server = redis.Redis("localhost")
-cache_timeout = 1800
+cache_timeout = 1800 #30mins
 
 class search(object):
 
     def GET(self):
         u = web.input()
         search_query = u['searchd']
+
+        if not search_query: 
+            raise web.seeother('../')
 
         sk = SkuInfo()
         res = sk.cl.Query(search_query)
@@ -43,6 +46,7 @@ class search(object):
         id_select = ','.join(collected_ids)
         
         ids_list = None
+
         if ids: 
             if r_server.get("search_results:%s" % search_query):
                 print "from cache:search_results"
@@ -129,17 +133,17 @@ class browse(object):
         db.bind.execute(sql)  
         
         sql = text("""SELECT FOUND_ROWS() as foundRows""")
-        """
-        total_entries_select_key = "foundrows:%s" % (":".join(sites_for_now))
-        if r_server.get(total_entries_select_key): 
-            print "cache_hit:browsedate-foundrows:retrieve"
-            total_entries = cPickle.loads(r_server.get(total_entries_select_key))
-        else: 
-            print "cache_hit:browsedate-foundrows:set"
-            res = db.bind.execute(sql)
-            total_entries = res.fetchall()[0][0]
-            r_server.set(total_entries_select_key, cPickle.dumps(total_entries))
-        """
+        
+        #total_entries_select_key = "foundrows:%s" % (":".join(sites_for_now))
+        #if r_server.get(total_entries_select_key): 
+        #    print "cache_hit:browsedate-foundrows:retrieve"
+        #    total_entries = cPickle.loads(r_server.get(total_entries_select_key))
+        #else: 
+        #    print "cache_hit:browsedate-foundrows:set"
+        #    res = db.bind.execute(sql)
+        #    total_entries = res.fetchall()[0][0]
+        #    r_server.set(total_entries_select_key, cPickle.dumps(total_entries))
+       
         res = db.bind.execute(sql)
         total_entries = res.fetchall()[0][0]
        
