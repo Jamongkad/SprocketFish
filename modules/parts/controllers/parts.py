@@ -54,11 +54,9 @@ class search(object):
                 ids_list_for_cache = cPickle.dumps(ids_list)
                 r_server.set("search_results:%s" % search_query, ids_list_for_cache)
 
-        r_server.expire("search_results:%s" % search_query, cache_timeout)
-       
+        r_server.expire("search_results:%s" % search_query, cache_timeout) 
         return render('search_results.mako', rp=ids_list, search_term=search_query)
-
-    
+ 
 class view(object):
     def GET(self):
         u = web.input()   
@@ -131,7 +129,7 @@ class browse(object):
         db.bind.execute(sql)  
         
         sql = text("""SELECT FOUND_ROWS() as foundRows""")
-
+        """
         total_entries_select_key = "foundrows:%s" % (":".join(sites_for_now))
         if r_server.get(total_entries_select_key): 
             print "cache_hit:browsedate-foundrows:retrieve"
@@ -141,6 +139,9 @@ class browse(object):
             res = db.bind.execute(sql)
             total_entries = res.fetchall()[0][0]
             r_server.set(total_entries_select_key, cPickle.dumps(total_entries))
+        """
+        res = db.bind.execute(sql)
+        total_entries = res.fetchall()[0][0]
        
         pg = Pageset(total_entries, 50)
         pg.current_page(current_page)
@@ -151,6 +152,7 @@ class browse(object):
                   , dp.list_sku AS sku 
                   , SUBSTRING_INDEX( SUBSTRING_INDEX(lp.idlistings_posts, ':', 2), ':', -1) AS post_id
                 FROM 
+                    /*
                     (SELECT 
                          list_sku 
                        , list_title
@@ -160,7 +162,10 @@ class browse(object):
                      WHERE 1=1
                          AND SUBSTRING_INDEX(list_sku, ":", 1) IN (%(site_select)s)
                     ) AS dp
+                    */
+                    data_prep AS dp
                 INNER JOIN
+                    /*
                     (SELECT
                          idlistings_posts
                        , list_sku
@@ -170,9 +175,13 @@ class browse(object):
                      WHERE 1=1
                          AND list_starter = 1 
                     ) AS lp
+                    */
+                    listings_posts AS lp
                         ON lp.list_sku = dp.list_sku 
                 WHERE 1=1
                     %(img)s
+                    AND SUBSTRING_INDEX(dp.list_sku, ":", 1) IN (%(site_select)s)
+                    AND lp.list_starter = 1
                 ORDER BY
                     list_date DESC
                 LIMIT %(offset)i, %(limit)i
@@ -223,7 +232,7 @@ class browse(object):
   
         r_server.expire(option_select_key, cache_timeout)        
         r_server.expire(option_select_key_browse, cache_timeout)        
-        r_server.expire(total_entries_select_key, cache_timeout)
+        #r_server.expire(total_entries_select_key, cache_timeout)
 
         #r_server.delete(option_select_key)
         #r_server.delete(option_select_key_browse)
