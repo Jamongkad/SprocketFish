@@ -7,11 +7,13 @@ import MultiDict
 from dateutil import parser
 from datetime import date, timedelta
 
-try: 
-    sql_db = SqlSoup('mysql://mathew:p455w0rd@localhost/hero_fish_db?charset=utf8&use_unicode=0', echo=True)
-except:
-    sql_db.rollback()
-    raise
+#try: 
+#    sql_db = SqlSoup('mysql://root:p455w0rd@localhost/hero_fish_db?charset=utf8&use_unicode=0', echo=True)
+#except:
+#    sql_db.rollback()
+#    raise
+
+sql_db = SqlSoup('mysql://root:p455w0rd@localhost/hero_fish_db?charset=utf8&use_unicode=0')
 
 def crawler(pd):
      
