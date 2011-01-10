@@ -115,7 +115,7 @@ class browse(object):
             GROUP BY 
                 list_title 
         """ % (values)
-        db.bind.execute(sql_rows)  
+        res_rows = db.bind.execute(sql_rows)  
         
         sql_foundRows = text("""SELECT FOUND_ROWS() as foundRows""")
         
@@ -129,10 +129,10 @@ class browse(object):
         #    total_entries = res.fetchall()[0][0]
         #    r_server.set(total_entries_select_key, cPickle.dumps(total_entries))
        
-        res = db.bind.execute(sql_foundRows)
-        total_entries = res.fetchall()
+        res_foundRows = db.bind.execute(sql_foundRows)
+        total_entries = res_foundRows.fetchall()
 
-        return total_entries, sql_rows
+        return total_entries, res_rows.fetchall()
        
         pg = Pageset(total_entries, 50)
         pg.current_page(current_page)
