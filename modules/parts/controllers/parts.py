@@ -70,22 +70,7 @@ class view(object):
         img  = '&with_img=' + u['with_img'] if 'with_img' in u else ''
         srch = u['searchd'] if 'searchd' in u else None
 
-        sql = text("""
-            SELECT   
-                data_prep.list_title AS title
-              , listings_posts.list_text_html AS html
-              , listings_posts.list_author AS auth
-              , DATE_FORMAT(data_prep.list_date, GET_FORMAT(DATE, 'USA')) AS date
-            FROM 
-                data_prep
-            INNER JOIN
-                listings_posts
-                ON data_prep.list_sku = listings_posts.list_sku
-            where 1=1 
-                AND data_prep.list_sku = :x
-                AND listings_posts.list_starter = 1 
-        """) 
-        rp = db.bind.execute(sql, x=u['list_id'])
+        rp = parts_model.Sites().view_entry(u['list_id'])
         return render('part_view.mako', rp=rp.fetchall(), pg=pg, sl=sl, img=img, srch=srch)
 
 class browse(object):
@@ -232,8 +217,7 @@ class browse(object):
                 d.setdefault(i[0], [])
                 d[i[0]].append((i[1], i[2]))
             r_server.set(option_select_key_browse, cPickle.dumps(d))
-        
-  
+          
         r_server.expire(option_select_key, cache_timeout)        
         r_server.expire(option_select_key_browse, cache_timeout)        
         #r_server.expire(total_entries_select_key, cache_timeout)

@@ -7,8 +7,9 @@ from sqlalchemy.sql import text
 """
 please clean this up!
 """
-try: 
-    sql_db = SqlSoup('mysql://mathew:p455w0rd@localhost/hero_fish_db', echo=True)
-except:
-    sql_db.rollback()
-    raise
+#try: 
+#    sql_db = SqlSoup('mysql://mathew:p455w0rd@localhost/hero_fish_db', echo=True)
+#except:
+#    sql_db.rollback()
+#    raise
+sql_db = SqlSoup('mysql://mathew:p455w0rd@localhost/hero_fish_db', echo=True)
