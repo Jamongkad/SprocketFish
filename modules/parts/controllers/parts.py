@@ -131,10 +131,8 @@ class browse(object):
        
         res_foundRows = db.bind.execute(sql_foundRows)
         total_entries = res_foundRows.fetchall()
-
-        return len(res_rows.fetchall())
        
-        pg = Pageset(total_entries, 50)
+        pg = Pageset(len(res_rows.fetchall()), 50)
         pg.current_page(current_page)
         date_sql = """
                 SELECT 
