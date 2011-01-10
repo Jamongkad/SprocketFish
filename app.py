@@ -21,7 +21,6 @@ urls = (
     '/create_account', 'create_account',
     '/welcome', welcome.app,
     '/site', site_admin.app,
-    '/job', job.app, 
     '/parts', parts.app
 )
 
