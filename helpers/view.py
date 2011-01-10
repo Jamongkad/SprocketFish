@@ -10,7 +10,6 @@ def gather_view_files():
         if re.search('(?<=views)', dirpath)]
 
     mylookup = TemplateLookup(directories, output_encoding='utf-8')
-
     return mylookup
 
 def render(templatename, **kwa):

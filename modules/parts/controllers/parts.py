@@ -51,7 +51,7 @@ class search(object):
             if r_server.get("search_results:%s" % search_query):
                 print "from cache:search_results"
                 ids_list_redis = r_server.get("search_results:%s" % search_query)
-                ids_list = cPickle.loads(ids_list_redis)
+                ids_list = cPickle.loads(str(ids_list_redis))
             else: 
                 print "set cache:search_results"
                 ids_list = sk.sku_info(id_select, search_query)
