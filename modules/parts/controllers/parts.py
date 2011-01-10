@@ -100,7 +100,7 @@ class browse(object):
 
         values = {'site_select': site_select, 'img': img_post_ids}
 
-        sql = """
+        sql_rows = """
             SELECT 
                 SQL_CALC_FOUND_ROWS
                 list_title 
@@ -115,9 +115,9 @@ class browse(object):
             GROUP BY 
                 list_title 
         """ % (values)
-        db.bind.execute(sql)  
+        db.bind.execute(sql_rows)  
         
-        sql = text("""SELECT FOUND_ROWS() as foundRows""")
+        sql_foundRows = text("""SELECT FOUND_ROWS() as foundRows""")
         
         #total_entries_select_key = "foundrows:%s" % (":".join(sites_for_now))
         #if r_server.get(total_entries_select_key): 
@@ -129,7 +129,7 @@ class browse(object):
         #    total_entries = res.fetchall()[0][0]
         #    r_server.set(total_entries_select_key, cPickle.dumps(total_entries))
        
-        res = db.bind.execute(sql)
+        res = db.bind.execute(sql_foundRows)
         total_entries = res.fetchall()
 
         return total_entries
