@@ -181,7 +181,7 @@ class browse(object):
 
         if r_server.get(option_select_key): 
             print "cache_hit:browsedata-date:retrieve"
-            date_result = cPickle.loads(r_server.get(option_select_key))
+            date_result = cPickle.loads(str(r_server.get(option_select_key)))
         else:
             print "cache_hit:browsedata-date:set"
             date_result = db.bind.execute(date_sql).fetchall()
@@ -209,7 +209,7 @@ class browse(object):
 
         if r_server.get(option_select_key_browse): 
             print "cache_hit:browsedata-browse:retrieve"
-            d = cPickle.loads(r_server.get(option_select_key_browse))
+            d = cPickle.loads(str(r_server.get(option_select_key_browse)))
         else:
             print "cache_hit:browsedata-browse:set"
             d = OrderedDict()
