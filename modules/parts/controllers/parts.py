@@ -130,7 +130,7 @@ class browse(object):
         #    r_server.set(total_entries_select_key, cPickle.dumps(total_entries))
        
         res = db.bind.execute(sql)
-        total_entries = res.fetchall()[0][0]
+        total_entries = res.fetchall()
 
         return total_entries
        
