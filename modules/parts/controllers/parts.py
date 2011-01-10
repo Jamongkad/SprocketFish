@@ -60,7 +60,7 @@ class search(object):
                 ids_list_for_cache = cPickle.dumps(ids_list)
                 r_server.set("search_results:%s" % search_set_redis, ids_list_for_cache)
 
-        r_server.expire("search_results:%s" % search_query, cache_timeout) 
+        r_server.expire("search_results:%s" % search_set_redis, cache_timeout) 
         return render('search_results.mako', rp=ids_list, search_term=search_query)
  
 class view(object):
