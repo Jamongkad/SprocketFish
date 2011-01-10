@@ -131,6 +131,8 @@ class browse(object):
        
         res = db.bind.execute(sql)
         total_entries = res.fetchall()[0][0]
+
+        return total_entries
        
         pg = Pageset(total_entries, 50)
         pg.current_page(current_page)
