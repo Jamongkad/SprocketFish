@@ -9,7 +9,7 @@ from SprocketAuth import SprocketAuth
 
 from db import sql_db as db
 
-import welcome, site_admin, masthead, header, job, parts
+import welcome, site_admin, masthead, header, parts
 
 web.config.debug = True
 
