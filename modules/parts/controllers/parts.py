@@ -47,10 +47,8 @@ class search(object):
         
         ids_list = None
 
-        return search_query
-
         if ids: 
-            if r_server.get("search_results:%s" % search_query):
+            if r_server.get("search_results:%s" % "-".join(search_query.split(" "))):
                 print "from cache:search_results"
                 ids_list_redis = r_server.get("search_results:%s" % search_query)
                 ids_list = cPickle.loads(ids_list_redis)
