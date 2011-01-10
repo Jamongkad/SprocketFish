@@ -48,6 +48,7 @@ class search(object):
         ids_list = None
 
         search_set_redis = "-".join(search_query.split(" "))
+        return search_set_redis
 
         if ids: 
             if r_server.get("search_results:%s" % search_set_redis):
