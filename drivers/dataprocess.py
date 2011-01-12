@@ -52,14 +52,13 @@ def crawler(pd):
         url = define_link(links, pd.reform_url)
 
         rawfromiso = authors[0].encode('iso-8859-1')
-        l_author = unicode(rawfromiso, 'latin-1').encode('utf-8')
+        l_author = unicode(rawfromiso, 'iso-8859-1').encode('utf-8')
         #debug output
         print "-------------------------------------------------"
         if matches:
             sku = "%s:%s" % (pd.site_id, matches)
             print "sku: %s" % (sku)
         import chardet
-        print chardet.detect(authors[0])
         print "scraping entry: %s, url: %s, author: %s" % (l_title, url, l_author)
         if get_date:
             print "created on %s" % (c_date)
