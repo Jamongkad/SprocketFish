@@ -25,6 +25,30 @@
         <title>${self.title()}</title>
 
     </head>
+   <!-- First include the script: -->
+    <script type="text/javascript">
+        var mp_protocol = (("https:" == document.location.protocol) ? "https://" : "http://");
+        document.write(unescape("%3Cscript src='" + mp_protocol + "api.mixpanel.com/site_media/js/api/mixpanel.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+
+    <!-- Initialize it with your project token -->
+    <script type="text/javascript">
+        try {
+            var mpmetrics = new MixpanelLib("3f80053e7a2c50d2919f7553c9dae366");
+        } catch(err) {
+            var null_fn = function () {};
+            var mpmetrics = {
+                track: null_fn,
+                track_funnel: null_fn,
+                register: null_fn,
+                register_once: null_fn,
+                register_funnel: null_fn,
+                identify: null_fn
+            };
+        }
+
+        mpmetrics.track("Unique Visitors");
+    </script> 
     <body>
     <%! import header %>
     ${header.index().GET()}
@@ -34,6 +58,10 @@
 
     <div style="text-align: center; margin-top: 100px; margin-bottom: 100px;  font-size: 10px">
         about | legal | twitter | facebook | suppliers | &copy;2010 GearFish
+        <br/><br/>
+        <p>
+        <a href="http://mixpanel.com/?from=partner"><img src="http://mixpanel.com/site_media/images/mixpanel_partner_logo.gif" alt="Mobile Analytics by Mixpanel" /></a>
+        </p>
     </div>
     </body>
 </html>
