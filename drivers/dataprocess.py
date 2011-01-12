@@ -138,7 +138,7 @@ def check_update_post(my_list, site_id, url, sku, l_title, data_obj):
         sql_db.data_prep.insert(list_sku=sku, list_title=l_title, site_id=site_id.site_id, list_url=url, list_authr=thread_author, list_date=post_date)
         #insert sub posts and authors
         for author in post_data.keys():
-            for idx, p in enumerate(post_data.getall(author)): 
+            for idx, p in enumerate(post_data.getall(process_author(author))): 
                 post_id = "postid-%s" % (idx)
                 post_id_sku = "%s:%s:%s" % (sku, post_id, author)   
                 print "inserting post %s" % (post_id_sku) 
