@@ -55,7 +55,7 @@ def crawler(pd):
         if matches:
             sku = "%s:%s" % (pd.site_id, matches)
             print "sku: %s" % (sku)
-        print "scraping entry: %s, url: %s, author: %s" % (l_title, url, authors[0])
+        print "scraping entry: %s, url: %s, author: %s" % (l_title, url, unicode(authors[0], 'latin-1'))
         if get_date:
             print "created on %s" % (c_date)
         if get_edit_date:
