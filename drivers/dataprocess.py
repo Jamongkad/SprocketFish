@@ -134,6 +134,7 @@ def check_update_post(my_list, site_id, url, sku, l_title, data_obj):
     else:
         print "new sku! inserting into data preparation table."
         #insert post
+        print thread_author
         sql_db.data_prep.insert(list_sku=sku, list_title=l_title, site_id=site_id.site_id, list_url=url, list_authr=thread_author, list_date=post_date)
         #insert sub posts and authors
         for author in post_data.keys():
