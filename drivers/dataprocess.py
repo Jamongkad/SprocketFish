@@ -140,7 +140,7 @@ def check_update_post(my_list, site_id, url, sku, l_title, data_obj):
             for idx, p in enumerate(post_data.getall(author)): 
                 post_id = "postid-%s" % (idx)
                 post_id_sku = "%s:%s:%s" % (sku, post_id, author)   
-                list_starter_check = is_list_starter(post_id, thread_author, author)
+                list_starter_check = is_list_starter(post_id, thread_author, process_author(author))
                 
                 print "inserting post %s" % (post_id_sku) 
                 sql_db.listings_posts.insert(idlistings_posts=post_id_sku, list_sku=sku, 
@@ -151,7 +151,7 @@ def check_update_post(my_list, site_id, url, sku, l_title, data_obj):
 
 def is_list_starter(post_id, thread_author, author): 
     check = 0
-    if post_id == "postid-0" and process_author(thread_author) == process_author(author):
+    if post_id == "postid-0" and thread_author == author:
         check = 1
 
     return check
