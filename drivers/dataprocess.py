@@ -79,7 +79,7 @@ def crawler(pd):
                 print "failure in sku extraction..."
                 sys.exit()   
 
-            pdp = ProcessDataPosts(posts, l_author, pd.site_id, date)
+            pdp = ProcessDataPosts(posts, authors, pd.site_id, date)
             check_update_post(my_list, site_id, url, sku, l_title, pdp)
 
         except Exception, err:
@@ -175,8 +175,12 @@ class ProcessDataPosts(object):
         self.posts   = posts
         self.authors = authors
         self.site_id = site_id
-        self.thread_author = authors
+        self.thread_author = self._process_author(authors[0])
         self.post_date = post_date
+
+    def _process_author(self, author):
+        rawfromiso = author.encode('iso-8859-1')
+        return unicode(rawfromiso, 'iso-8859-1').encode('utf-8')
 
     def process_post_data(self):
         storage = MultiDict.OrderedMultiDict()
