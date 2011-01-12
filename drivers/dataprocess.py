@@ -65,23 +65,7 @@ def crawler(pd):
         if get_edit_date:
             print "edited on %s" % (e_date)
   
-        #database stuff
-
-        date = current_date(get_date, get_edit_date, pd.date_regex, pd.site_id)
-        print "extracting post id for sku..."
-        if matches:
-            print "extraction successful!!"
-            sku = "%s:%s" % (pd.site_id, matches)
-            print "checking record for existing sku..."
-            my_list = sql_db.data_prep.filter(sql_db.data_prep.list_sku==sku).first()
-            print "finalized date on : %s" % (date)
-        else:
-            print "failure in sku extraction..."
-            sys.exit()   
-
-        pdp = ProcessDataPosts(posts, authors, pd.site_id, date)
-        check_update_post(my_list, site_id, url, sku, l_title, pdp)
-        """
+        #database stuff  
         try:
             date = current_date(get_date, get_edit_date, pd.date_regex, pd.site_id)
             print "extracting post id for sku..."
@@ -102,8 +86,7 @@ def crawler(pd):
             print "something went wrong! rolling back table! ERROR: %s" % (str(err))
             sql_db.rollback()
             sys.exit()
-        """
-
+       
         br.back()
     
 def check_update_post(my_list, site_id, url, sku, l_title, data_obj):
@@ -157,13 +140,13 @@ def check_update_post(my_list, site_id, url, sku, l_title, data_obj):
         for author in post_data.keys():
             for idx, p in enumerate(post_data.getall(author)): 
                 post_id = "postid-%s" % (idx)
-                post_id_sku = "%s:%s:%s" % (sku, post_id, process_author(author))   
-                print process_author(author)
+                me_author = process_author(author)
+                post_id_sku = "%s:%s:%s" % (sku, post_id, me_author)   
                 print "inserting post %s" % (post_id_sku) 
 
-                list_starter_check = is_list_starter(post_id, thread_author, author)
+                list_starter_check = is_list_starter(post_id, thread_author, me_author)
                 sql_db.listings_posts.insert(idlistings_posts=post_id_sku, list_sku=sku, 
-                                             list_text_text=p[0], list_text_html=p[1], list_author=author, list_starter=list_starter_check)
+                                             list_text_text=p[0], list_text_html=p[1], list_author=me_author, list_starter=list_starter_check)
         
         sql_db.commit()
         print "insertion successful!"
