@@ -55,7 +55,7 @@ def crawler(pd):
         if matches:
             sku = "%s:%s" % (pd.site_id, matches)
             print "sku: %s" % (sku)
-        print "scraping entry: %s, url: %s " % (l_title, url)
+        print "scraping entry: %s, url: %s, author: %s" % (l_title, url, authors[0])
         if get_date:
             print "created on %s" % (c_date)
         if get_edit_date:
@@ -171,7 +171,7 @@ class ProcessDataPosts(object):
         self.posts   = posts
         self.authors = authors
         self.site_id = site_id
-        self.thread_author = authors[0] 
+        self.thread_author = unicode(authors[0], 'latin-1').encode('utf-8')
         self.post_date = post_date
 
     def process_post_data(self):
