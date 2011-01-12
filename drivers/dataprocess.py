@@ -66,6 +66,22 @@ def crawler(pd):
             print "edited on %s" % (e_date)
   
         #database stuff
+
+        date = current_date(get_date, get_edit_date, pd.date_regex, pd.site_id)
+        print "extracting post id for sku..."
+        if matches:
+            print "extraction successful!!"
+            sku = "%s:%s" % (pd.site_id, matches)
+            print "checking record for existing sku..."
+            my_list = sql_db.data_prep.filter(sql_db.data_prep.list_sku==sku).first()
+            print "finalized date on : %s" % (date)
+        else:
+            print "failure in sku extraction..."
+            sys.exit()   
+
+        pdp = ProcessDataPosts(posts, authors, pd.site_id, date)
+        check_update_post(my_list, site_id, url, sku, l_title, pdp)
+        """
         try:
             date = current_date(get_date, get_edit_date, pd.date_regex, pd.site_id)
             print "extracting post id for sku..."
@@ -86,6 +102,7 @@ def crawler(pd):
             print "something went wrong! rolling back table! ERROR: %s" % (str(err))
             sql_db.rollback()
             sys.exit()
+        """
 
         br.back()
     
