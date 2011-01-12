@@ -52,7 +52,7 @@ def crawler(pd):
         url = define_link(links, pd.reform_url)
 
         rawfromiso = authors[0].encode('iso-8859-1')
-        l_author = unicode(rawfromiso, 'latin-1')
+        l_author = unicode(rawfromiso, 'latin-1').encode('utf-8')
         #debug output
         print "-------------------------------------------------"
         if matches:
