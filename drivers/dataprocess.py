@@ -142,7 +142,7 @@ def check_update_post(my_list, site_id, url, sku, l_title, data_obj):
                 post_id = "postid-%s" % (idx)
                 post_id_sku = "%s:%s:%s" % (sku, post_id, author)   
                 print "inserting post %s" % (post_id_sku) 
-                list_starter_check = is_list_starter(post_id, thread_author, process_author(author))
+                list_starter_check = is_list_starter(post_id, thread_author, author)
                 sql_db.listings_posts.insert(idlistings_posts=post_id_sku, list_sku=sku, 
                                              list_text_text=p[0], list_text_html=p[1], list_author=author, list_starter=list_starter_check)
         
@@ -212,7 +212,6 @@ def current_date(get_date, get_edit_date, date_regex, site_id):
         post_date = re.compile(date_regex).findall(get_date) 
 
     return parser.parse(post_date[0]).date().isoformat()
-
 
 def process_author(author):
     rawfromiso = author.encode('iso-8859-1')
