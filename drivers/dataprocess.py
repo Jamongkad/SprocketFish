@@ -50,12 +50,16 @@ def crawler(pd):
 
         (matches, ) = re.compile(pd.post_regex).findall(links.url)
         url = define_link(links, pd.reform_url)
+
+        iso8859string = unicode(authors[0], 'iso-8859-1')
+        rawfromiso = iso8859string.encode('iso-8859-1')
+        l_author = unicode(rawfromiso, 'utf-8')
         #debug output
         print "-------------------------------------------------"
         if matches:
             sku = "%s:%s" % (pd.site_id, matches)
             print "sku: %s" % (sku)
-        print "scraping entry: %s, url: %s, author: %s" % (l_title, url, unicode(authors[0], 'utf-8'))
+        print "scraping entry: %s, url: %s, author: %s" % (l_title, url, l_author)
         if get_date:
             print "created on %s" % (c_date)
         if get_edit_date:
