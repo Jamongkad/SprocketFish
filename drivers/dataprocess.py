@@ -151,7 +151,7 @@ def check_update_post(my_list, site_id, url, sku, l_title, data_obj):
 
 def is_list_starter(post_id, thread_author, author): 
     check = 0
-    if post_id == "postid-0" and thread_author == author:
+    if post_id == "postid-0" and process_author(thread_author) == process_author(author):
         check = 1
 
     return check
@@ -175,12 +175,8 @@ class ProcessDataPosts(object):
         self.posts   = posts
         self.authors = authors
         self.site_id = site_id
-        self.thread_author = self._process_author(authors[0])
+        self.thread_author = process_author(authors[0])
         self.post_date = post_date
-
-    def _process_author(self, author):
-        rawfromiso = author.encode('iso-8859-1')
-        return unicode(rawfromiso, 'iso-8859-1').encode('utf-8')
 
     def process_post_data(self):
         storage = MultiDict.OrderedMultiDict()
@@ -216,3 +212,8 @@ def current_date(get_date, get_edit_date, date_regex, site_id):
         post_date = re.compile(date_regex).findall(get_date) 
 
     return parser.parse(post_date[0]).date().isoformat()
+
+
+def process_author(author):
+    rawfromiso = author.encode('iso-8859-1')
+    return unicode(rawfromiso, 'iso-8859-1').encode('utf-8')
