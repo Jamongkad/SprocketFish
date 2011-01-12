@@ -158,7 +158,7 @@ def check_update_post(my_list, site_id, url, sku, l_title, data_obj):
             for idx, p in enumerate(post_data.getall(author)): 
                 post_id = "postid-%s" % (idx)
                 post_id_sku = "%s:%s:%s" % (sku, post_id, process_author(author))   
-                print author
+                print process_author(author)
                 print "inserting post %s" % (post_id_sku) 
 
                 list_starter_check = is_list_starter(post_id, thread_author, author)
