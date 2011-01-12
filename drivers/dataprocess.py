@@ -151,15 +151,16 @@ def check_update_post(my_list, site_id, url, sku, l_title, data_obj):
     else:
         print "new sku! inserting into data preparation table."
         #insert post
-        print thread_author
         sql_db.data_prep.insert(list_sku=sku, list_title=l_title, site_id=site_id.site_id, list_url=url, list_authr=thread_author, list_date=post_date)
         #insert sub posts and authors
         print "processing new data into listings posts table"
         for author in post_data.keys():
             for idx, p in enumerate(post_data.getall(author)): 
                 post_id = "postid-%s" % (idx)
-                post_id_sku = "%s:%s:%s" % (sku, post_id, author)   
+                post_id_sku = "%s:%s:%s" % (sku, post_id, process_author(author))   
+                print author
                 print "inserting post %s" % (post_id_sku) 
+
                 list_starter_check = is_list_starter(post_id, thread_author, author)
                 sql_db.listings_posts.insert(idlistings_posts=post_id_sku, list_sku=sku, 
                                              list_text_text=p[0], list_text_html=p[1], list_author=author, list_starter=list_starter_check)
