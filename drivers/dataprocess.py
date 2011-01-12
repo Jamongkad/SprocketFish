@@ -171,7 +171,7 @@ class ProcessDataPosts(object):
         self.posts   = posts
         self.authors = authors
         self.site_id = site_id
-        self.thread_author = unicode(authors[0], 'latin-1').encode('utf-8')
+        self.thread_author = unicode(authors[0], 'latin-1')
         self.post_date = post_date
 
     def process_post_data(self):
