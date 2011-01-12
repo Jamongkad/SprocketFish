@@ -51,8 +51,7 @@ def crawler(pd):
         (matches, ) = re.compile(pd.post_regex).findall(links.url)
         url = define_link(links, pd.reform_url)
 
-        iso8859string = unicode(authors[0], 'iso-8859-1')
-        rawfromiso = iso8859string.encode('iso-8859-1')
+        rawfromiso = authors[0].encode('iso-8859-1')
         l_author = unicode(rawfromiso, 'utf-8')
         #debug output
         print "-------------------------------------------------"
