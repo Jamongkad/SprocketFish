@@ -5,8 +5,6 @@
         <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.3/jquery-ui.min.js" type="text/javascript"></script> 
         <script src="http://jquery-ui.googlecode.com/svn/tags/latest/external/jquery.bgiframe-2.1.1.js" type="text/javascript"></script> 
         <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.3/i18n/jquery-ui-i18n.min.js" type="text/javascript"></script>
-        <script type="text/javascript" src="http://ajax.microsoft.com/ajax/jquery.validate/1.7/jquery.validate.min.js"></script>
-        <script type="text/javascript" src="https://github.com/malsup/form/raw/master/jquery.form.js?v2.4"></script>
 
         <script type="text/javascript" src="/static/js/underscore-min.js"></script>   
         <script type="text/javascript" src="/static/js/jquery.asmselect.js"></script>   
