@@ -48,6 +48,13 @@
         }
 
         mpmetrics.track("Unique Visitors");
+
+        $('a.browse-link').click(function() {
+            mpmetrics.track('click browse', {'nav item' : 'browse'}, function() {
+                window.location = "http://www.gearfish.com/parts/browse?pg=1";
+            });
+            return false;
+        })
     </script> 
     <body>
     <%! import header %>
