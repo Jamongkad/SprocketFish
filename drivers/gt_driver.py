@@ -79,6 +79,3 @@ def main():
                 #processing = False
             #log_message('gt-driver_%d' % nxt_pge_cnt) 
             br.back() 
-
-if __name__ == '__main__':
-    main()

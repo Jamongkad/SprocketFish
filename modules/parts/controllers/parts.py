@@ -102,7 +102,7 @@ class browse(object):
 
         values = {'site_select': site_select, 'img': img_post_ids}
 
-        sql = """
+        sql_rows = """
             SELECT 
                 SQL_CALC_FOUND_ROWS
                 list_title 
