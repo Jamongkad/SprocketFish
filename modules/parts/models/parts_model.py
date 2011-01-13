@@ -17,6 +17,7 @@ class Sites(object):
               , listings_posts.list_text_html AS html
               , listings_posts.list_author AS auth
               , DATE_FORMAT(data_prep.list_date, GET_FORMAT(DATE, 'USA')) AS date
+              , data_prep.list_url AS url
             FROM 
                 data_prep
             INNER JOIN

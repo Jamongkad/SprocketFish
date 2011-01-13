@@ -19,6 +19,7 @@ class SkuInfo(object):
               , listings_posts.list_text_text AS text
               , listings_posts.list_text_html AS html
               , listings_posts.list_author AS auth
+              , data_prep.list_url AS url
             FROM 
                 data_prep 
             INNER JOIN
@@ -43,6 +44,7 @@ class SkuInfo(object):
                 'title' : entry[1],
                 'list_id' : entry[2], 
                 'sku' : entry[3],
+                'url' : entry[7],
                 'excerpts' : self.cl.BuildExcerpts(docs, 'posts', search_term, { 'single_passage' : True })
             }
 
