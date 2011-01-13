@@ -51,9 +51,8 @@
 
         $('a.browse-link').click(function() {
             mpmetrics.track('click browse', {'nav item' : 'browse'}, function() {
-                window.location = "http://www.gearfish.com/parts/browse?pg=1";
+                window.location = "/parts/browse?pg=1";
             });
-            console.log("browse clicked");
             return false;
         })
     </script> 
