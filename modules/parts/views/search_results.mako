@@ -23,9 +23,6 @@
                         ${d['excerpts'][0]}                   
                     </div>
                 </div>
-                <!--
-                <a href="${d['url']}" >Forum Link</a>
-                -->
             % endfor
         % else:
             <b>No results found...</b>
