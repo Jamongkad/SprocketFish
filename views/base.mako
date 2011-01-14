@@ -57,6 +57,34 @@
             });
             return false;
         })
+
+        $('a.JDMU').click(function() {
+            mpmetrics.track('click forum source', {'nav item' : 'JDMU'}, function() {
+                window.location = "/parts/browse?pg=1&sl=JDMU";
+            });
+            return false;     
+        })
+
+        $('a.HCP').click(function() {
+            mpmetrics.track('click forum source', {'nav item' : 'HCP'}, function() {
+                window.location = "/parts/browse?pg=1&sl=HCP";
+            });
+            return false;     
+        })
+
+        $('a.GT').click(function() {
+            mpmetrics.track('click forum source', {'nav item' : 'GT'}, function() {
+                window.location = "/parts/browse?pg=1&sl=GT";
+            });
+            return false;     
+        })
+
+        $('a.MLPH').click(function() {
+            mpmetrics.track('click forum source', {'nav item' : 'MLPH'}, function() {
+                window.location = "/parts/browse?pg=1&sl=MLPH";
+            });
+            return false;     
+        })
     </script> 
 
     <body>
