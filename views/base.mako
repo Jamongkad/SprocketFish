@@ -69,12 +69,12 @@
     <div class="footer">
         <a href="#">about</a> | <a href="#">legal</a> | <a href="#">twitter</a> | <a href="#">facebook</a> | <a href="#">suppliers</a>
         <div class="copy">&copy;2010 GearFish created by Mathew Wong</div>
-        <br/><br/>
-
+        <br/>
         <p>  
         <a href="http://mixpanel.com/?from=partner"><img src="http://mixpanel.com/site_media/images/mixpanel_partner_logo.gif" alt="Mobile Analytics by Mixpanel" /></a>
      
         </p>
+
 
     </div>
     </body>
