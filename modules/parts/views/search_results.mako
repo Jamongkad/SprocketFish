@@ -2,10 +2,9 @@
 <%def name="title()">
     GearFish Search for: "${search_term}"
 </%def>
-
 <div class="container_12">
-    <p style="height: 30px"></p>
     <div id="searchd">
+        <div id="title">Gear<span id="logo">Fish</span></div>       
         <form method="GET" action="/parts/search">
             <input type="text" name="searchd" value="${search_term}" id="search_box" />
             <input type="submit" value="search" id="search_btn"/>

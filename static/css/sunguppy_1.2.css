@@ -124,8 +124,8 @@ ul.job_nav li:hover,
 
 #title { 
     font-size:2em; 
-    margin: 30px 0; 
-    height: 65px;
+    margin: 25px 0; 
+    height: 50px;
     font-size: 35pt;
 }
 
@@ -237,4 +237,15 @@ a {
 
 .toolbar-checkboxes-filter {
     vertical-align: middle:    
+}
+
+.footer {
+    text-align: center;    
+    margin-top: 100px;
+    margin-bottom: 100px;
+    font-size: 1.2em;
+}
+
+.copy {
+    font-size: 0.7em; 
 }

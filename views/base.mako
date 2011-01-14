@@ -1,11 +1,13 @@
 <html>
     <head> 
-        
+
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js" type="text/javascript"></script> 
         <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.3/jquery-ui.min.js" type="text/javascript"></script> 
         <script src="http://jquery-ui.googlecode.com/svn/tags/latest/external/jquery.bgiframe-2.1.1.js" type="text/javascript"></script> 
         <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.3/i18n/jquery-ui-i18n.min.js" type="text/javascript"></script>
 
+
+        <!--<script type="text/javascript" src="/static/js/jquery.js"></script>-->
         <script type="text/javascript" src="/static/js/underscore-min.js"></script>   
         <script type="text/javascript" src="/static/js/jquery.asmselect.js"></script>   
 
@@ -16,7 +18,7 @@
         <link rel="stylesheet" type="text/css" href="/static/css/fluid_grid.css"></link>
         <link rel="stylesheet" type="text/css" href="/static/css/jquery.asmselect.css"></link>
         <link rel="stylesheet" type="text/css" href="/static/css/datePicker.css"></link>
-
+        
         <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.3/themes/base/jquery-ui.css" type="text/css" media="all" /> 
         <link rel="stylesheet" href="http://static.jquery.com/ui/css/demo-docs-theme/ui.theme.css" type="text/css" media="all" /> 
 
@@ -24,10 +26,12 @@
 
     </head>
    <!-- First include the script: -->
+
     <script type="text/javascript">
         var mp_protocol = (("https:" == document.location.protocol) ? "https://" : "http://");
         document.write(unescape("%3Cscript src='" + mp_protocol + "api.mixpanel.com/site_media/js/api/mixpanel.js' type='text/javascript'%3E%3C/script%3E"));
     </script>
+
 
     <!-- Initialize it with your project token -->
     <script type="text/javascript">
@@ -54,6 +58,7 @@
             return false;
         })
     </script> 
+
     <body>
     <%! import header %>
     ${header.index().GET()}
@@ -61,12 +66,16 @@
         ${self.body()}  
     </div>
 
-    <div style="text-align: center; margin-top: 100px; margin-bottom: 100px;  font-size: 10px">
-        about | legal | twitter | facebook | suppliers | &copy;2010 GearFish
+    <div class="footer">
+        <a href="#">about</a> | <a href="#">legal</a> | <a href="#">twitter</a> | <a href="#">facebook</a> | <a href="#">suppliers</a>
+        <div class="copy">&copy;2010 GearFish created by Mathew Wong</div>
         <br/><br/>
-        <p>
+
+        <p>  
         <a href="http://mixpanel.com/?from=partner"><img src="http://mixpanel.com/site_media/images/mixpanel_partner_logo.gif" alt="Mobile Analytics by Mixpanel" /></a>
+     
         </p>
+
     </div>
     </body>
 </html>

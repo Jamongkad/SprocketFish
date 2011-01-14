@@ -4,8 +4,8 @@
 </%def>
 
 <div class="container_12">
-    <p style="height: 30px"></p>
     <div id="searchd">
+        <div id="title">Gear<span id="logo">Fish</span></div>       
         <form method="GET" action="/parts/search">
             <input type="text" name="searchd" value="" id="search_box_part_view" />
             <input type="submit" value="search" id="search_btn_part_view"/>
