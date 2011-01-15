@@ -5,7 +5,7 @@ ${logged_in}
 <div id="nav_holder">
     <ul class="sprocket_nav">
         <li><strong><a class="search-link" href="/">Search</a></strong></li>
-        <li><strong><a class="browse-link" href="/parts/browse?pg=1">Browse Newest Items</a></strong></li>
+        <li><strong><a class="browse-link" href="/parts/browse?pg=1">Browse Newest Items!</a></strong></li>
     </ul>
     
     <!--
