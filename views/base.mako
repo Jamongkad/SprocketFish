@@ -50,6 +50,7 @@
         }
 
         mpmetrics.track("Unique Visitors");
+        mpmetrics.track_funnel("Unique IP Visitors", 1, "View Homepage");
 
         $('a.browse-link').click(function() {
             mpmetrics.track('click browse', {'nav item' : 'browse'}, function() {
