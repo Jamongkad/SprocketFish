@@ -20,13 +20,7 @@
                             <span id="brand"> ${d['sku'].split(":")[0]}</span></div> 
                     <div style="line-height: 1.4">
                         ${d['excerpts'][0]}                   
-                    </div>
-                    <div>
-                        <ul class="link_controls">
-                            <li><a href="/parts/flag?list_id=${d['sku']}">flag as sold</a></li>
-                            <li><a href="/parts/flag?list_id=${d['sku']}">duplicate link</a></li>
-                        </ul>
-                    </div>
+                    </div>  
                 </div>
             % endfor
         % else:
