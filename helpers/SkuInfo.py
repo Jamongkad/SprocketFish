@@ -28,6 +28,8 @@ class SkuInfo(object):
             WHERE 1=1 
                 AND SUBSTRING_INDEX( SUBSTRING_INDEX(listings_posts.idlistings_posts, ':', 2), ':', -1) IN (%(ids)s) 
                 AND listings_posts.list_starter = 1 
+            GROUP BY
+                data_prep.list_title
             ORDER BY
                 data_prep.list_date DESC
             """ % ({'ids': ids})

@@ -17,7 +17,7 @@ div#nav_holder{
 }
 
 ul.nav, 
-    .nav ul, ul.sprocket_nav, .sprocket_nav ul, .job_nav ul {
+    .nav ul, ul.sprocket_nav, .sprocket_nav ul, .job_nav ul, .link_controls ul {
     margin: 0;
     padding: 0;
     cursor: default;
@@ -43,6 +43,11 @@ ul.job_nav {
     float: left;
 }
 
+ul.job_nav { 
+    display: table;    
+    float: left;
+}
+
 ul.top_nav > li {    
     margin: 0;
     padding: 0;
@@ -60,6 +65,16 @@ ul.nav>li, ul.top_nav>li, ul.job_nav>li, ul.sprocket_nav>li {
     display: table-cell;
     position: relative;
     padding: 0px 6px;
+}
+
+ul.link_controls>li { 
+    display: table-cell;
+    position: relative;
+    padding: 0px 6px;
+}
+
+.link_controls a {
+    font-size: 1.2em;
 }
 
 ul.nav li>ul, ul.job_nav li>ul{
