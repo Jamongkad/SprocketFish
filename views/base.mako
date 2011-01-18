@@ -7,6 +7,7 @@
         <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.3/i18n/jquery-ui-i18n.min.js" type="text/javascript"></script>
 
 
+
         <!--<script type="text/javascript" src="/static/js/jquery.js"></script>-->
         <script type="text/javascript" src="/static/js/underscore-min.js"></script>   
         <script type="text/javascript" src="/static/js/jquery.asmselect.js"></script>   
@@ -18,9 +19,10 @@
         <link rel="stylesheet" type="text/css" href="/static/css/fluid_grid.css"></link>
         <link rel="stylesheet" type="text/css" href="/static/css/jquery.asmselect.css"></link>
         <link rel="stylesheet" type="text/css" href="/static/css/datePicker.css"></link>
-        
+
         <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.3/themes/base/jquery-ui.css" type="text/css" media="all" /> 
         <link rel="stylesheet" href="http://static.jquery.com/ui/css/demo-docs-theme/ui.theme.css" type="text/css" media="all" /> 
+
 
         <title>${self.title()}</title>
 
@@ -33,7 +35,9 @@
     </script>
 
 
+
     <!-- Initialize it with your project token -->
+
     <script type="text/javascript">
         try {
             var mpmetrics = new MixpanelLib("3f80053e7a2c50d2919f7553c9dae366");
@@ -87,7 +91,6 @@
             return false;     
         })
     </script> 
-
     <body>
     <%! import header %>
     ${header.index().GET()}
@@ -99,11 +102,11 @@
         <a href="#">about</a> | <a href="#">legal</a> | <a href="#">twitter</a> | <a href="#">facebook</a> | <a href="#">suppliers</a>
         <div class="copy">&copy;2010 GearFish created by Mathew Wong</div>
         <br/>
+
         <p>  
         <a href="http://mixpanel.com/?from=partner"><img src="http://mixpanel.com/site_media/images/mixpanel_partner_logo.gif" alt="Mobile Analytics by Mixpanel" /></a>
      
         </p>
-
 
     </div>
     </body>

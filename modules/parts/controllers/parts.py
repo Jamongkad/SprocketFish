@@ -19,6 +19,7 @@ urls = (
     '/search', 'search',
     '/view', 'view',
     '/browse', 'browse',
+    '/mark', 'mark',
     '/test', 'test'
 )
 
@@ -26,7 +27,7 @@ app = web.application(urls, globals(), autoreload=True)
 from SprocketAuth import SprocketAuth
 sa = SprocketAuth(app)
 r_server = redis.Redis("localhost")
-cache_timeout = 1800 #30mins
+cache_timeout = 3600 #1hour
 
 class search(object):
 
@@ -64,6 +65,7 @@ class search(object):
         return render('search_results.mako', rp=ids_list, search_term=search_query)
  
 class view(object):
+    
     def GET(self):
         u = web.input()   
 
@@ -73,7 +75,12 @@ class view(object):
         srch = u['searchd'] if 'searchd' in u else None
 
         rp = parts_model.Sites().view_entry(u['list_id'])
-        return render('part_view.mako', rp=rp.fetchall(), pg=pg, sl=sl, img=img, srch=srch)
+        return render('part_view.mako', rp=rp.fetchall(), pg=pg, sl=sl, img=img, srch=srch, list_id=u['list_id'])
+
+class mark(object):
+    def GET(self):
+        u = web.input()
+        return u['list_id'], u['type']
 
 class browse(object):
     def GET(self):

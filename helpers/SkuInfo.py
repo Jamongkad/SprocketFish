@@ -6,7 +6,7 @@ class SkuInfo(object):
         self.cl = sphinxapi.SphinxClient()
         self.cl.SetServer("127.0.0.1", 3312)
         self.cl.SetMatchMode(sphinxapi.SPH_MATCH_ALL)
-        self.cl.SetSortMode(sphinxapi.SPH_SORT_RELEVANCE)
+        self.cl.SetSortMode(sphinxapi.SPH_SORT_RELEVANCE) 
  
     def sku_info(self, ids, search_term):
 
@@ -28,8 +28,8 @@ class SkuInfo(object):
             WHERE 1=1 
                 AND SUBSTRING_INDEX( SUBSTRING_INDEX(listings_posts.idlistings_posts, ':', 2), ':', -1) IN (%(ids)s) 
                 AND listings_posts.list_starter = 1 
-            ORDER BY
-                data_prep.list_date DESC
+                AND YEAR(data_prep.list_date) <= YEAR(NOW())
+                AND YEAR(data_prep.list_date) >= YEAR(NOW()) - 1
             """ % ({'ids': ids})
 
         rp = db.bind.execute(sql)
