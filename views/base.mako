@@ -6,8 +6,6 @@
         <script src="http://jquery-ui.googlecode.com/svn/tags/latest/external/jquery.bgiframe-2.1.1.js" type="text/javascript"></script> 
         <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.3/i18n/jquery-ui-i18n.min.js" type="text/javascript"></script>
 
-
-
         <!--<script type="text/javascript" src="/static/js/jquery.js"></script>-->
         <script type="text/javascript" src="/static/js/underscore-min.js"></script>   
         <script type="text/javascript" src="/static/js/jquery.asmselect.js"></script>   
@@ -34,10 +32,7 @@
         document.write(unescape("%3Cscript src='" + mp_protocol + "api.mixpanel.com/site_media/js/api/mixpanel.js' type='text/javascript'%3E%3C/script%3E"));
     </script>
 
-
-
     <!-- Initialize it with your project token -->
-
     <script type="text/javascript">
         try {
             var mpmetrics = new MixpanelLib("3f80053e7a2c50d2919f7553c9dae366");
@@ -57,7 +52,7 @@
         mpmetrics.track_funnel("Unique IP Visitors", 1, "View Homepage");
 
         $('a.browse-link').click(function() {
-            mpmetrics.track('click browse', {'nav item' : 'browse'}, function() {
+            mpmetrics.track('click browse', function() {
                 window.location = "/parts/browse?pg=1";
             });
             return false;
@@ -91,6 +86,7 @@
             return false;     
         })
     </script> 
+
     <body>
     <%! import header %>
     ${header.index().GET()}
@@ -102,12 +98,9 @@
         <a href="#">about</a> | <a href="#">legal</a> | <a href="#">twitter</a> | <a href="#">facebook</a> | <a href="#">suppliers</a>
         <div class="copy">&copy;2010 GearFish created by Mathew Wong</div>
         <br/>
-
         <p>  
-        <a href="http://mixpanel.com/?from=partner"><img src="http://mixpanel.com/site_media/images/mixpanel_partner_logo.gif" alt="Mobile Analytics by Mixpanel" /></a>
-     
+        <a href="http://mixpanel.com/?from=partner"><img src="http://mixpanel.com/site_media/images/mixpanel_partner_logo.gif" alt="Mobile Analytics by Mixpanel" /></a> 
         </p>
-
     </div>
     </body>
 </html>
