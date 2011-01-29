@@ -151,8 +151,8 @@ ul.job_nav li:hover,
 }
 
 #search_box {
-    width: 364px; 
-    font-size: 20px; 
+    width: 500px; 
+    font-size: 17px; 
     padding: 5px 6px;
     height: 40px;
     color: #222222;
@@ -294,4 +294,12 @@ table.categories {
     margin-bottom: 50px;
     padding: 5px;
     text-align: left;
+}
+
+div#paginate-search {
+   text-align: center; 
+}
+
+div#paginate-search a {
+    font-size: 1.5em;
 }

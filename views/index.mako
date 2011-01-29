@@ -2,18 +2,13 @@
 <%def name="title()">
     GearFish 
 </%def>
-
-<script type="text/javascript">
-    $(function(){
-        $('input[name="searchd"]').focus();
-    })
-</script>
-
 <div style="text-align:center">
     <div id="title">Gear<span id="logo">Fish</span></div>       
     <div id="searchd">
         <form method="GET" action="/parts/search" id="searchform">
             <input type="text" name="searchd" value="" id="search_box" />
+            <input type="hidden" name="auth" value="" />
+            <input type="hidden" name="site" value="" />
             <input type="submit" value="search" id="search_btn"/>
         </form>
         <p id="desc_text">GearFish is an auto enthusiast powered search engine.</p>

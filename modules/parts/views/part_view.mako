@@ -5,6 +5,8 @@
     <div id="searchd">
         <form method="GET" action="/parts/search">
             <input type="text" name="searchd" value="" id="search_box_part_view" />
+            <input type="hidden" name="auth" value="" />
+            <input type="hidden" name="site" value="" />
             <input type="submit" value="search" id="search_btn_part_view"/>
         </form>
     </div>   
@@ -31,6 +33,7 @@
             </ul>
         </div>
         -->
+
         <div style="padding-top: 20px">${unicode(d[1], errors="ignore")}</div>
     % endfor
     </div>

@@ -2,13 +2,8 @@ import sphinxapi
 from db import sql_db as db
 
 class SkuInfo(object):
-    def __init__(self):
-        self.cl = sphinxapi.SphinxClient()
-        self.cl.SetServer("127.0.0.1", 3312)
-        self.cl.SetMatchMode(sphinxapi.SPH_MATCH_ALL)
-        self.cl.SetSortMode(sphinxapi.SPH_SORT_RELEVANCE) 
  
-    def sku_info(self, ids, search_term):
+    def sku_info(self, ids, search_term, sc):
 
         sql = """
             SELECT 
@@ -20,6 +15,7 @@ class SkuInfo(object):
               , listings_posts.list_text_html AS html
               , listings_posts.list_author AS auth
               , data_prep.list_url AS url
+              , data_prep.list_date AS date
             FROM 
                 data_prep 
             INNER JOIN
@@ -30,6 +26,8 @@ class SkuInfo(object):
                 AND listings_posts.list_starter = 1 
                 AND YEAR(data_prep.list_date) <= YEAR(NOW())
                 AND YEAR(data_prep.list_date) >= YEAR(NOW()) - 1
+            ORDER BY
+                data_prep.list_date DESC
             """ % ({'ids': ids})
 
         rp = db.bind.execute(sql)
@@ -45,7 +43,8 @@ class SkuInfo(object):
                 'list_id' : entry[2], 
                 'sku' : entry[3],
                 'url' : entry[7],
-                'excerpts' : self.cl.BuildExcerpts(docs, 'posts', search_term, { 'single_passage' : True })
+                'date': entry[8],
+                'excerpts' : sc.BuildExcerpts(docs, 'posts', search_term, { 'single_passage' : True }) if search_term else ""
             }
 
             storage.append(entry_object)
