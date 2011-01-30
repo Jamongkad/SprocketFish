@@ -78,30 +78,34 @@ class search(object):
             id_rows = db.bind.execute(sql_id)
             return [int(i[0]) for i in id_rows]
 
+        def splitify(target_id, key=False):
+            if target_id:
+                t_id = dict([(i.strip().split(":")[0], i.strip().split(":")[1]) for i in re.split('(@[a-zA-Z]+(:[a-zA-Z,-_|]+))', target_id) if re.search('@(\w+)', i)]) 
+                if key in t_id:
+                    return t_id[key].split("|")
+               
+
         search_query = search_query.strip()
         if re.compile('(@[a-zA-Z]+)').findall(search_query):            
             print "advance query"
             srch_terms = re.split('(@[a-zA-Z]+(:[a-zA-Z,-_|]+))', search_query)
-
-            authid = dict([(i.strip().split(":")[0], i.strip().split(":")[1]) for i in re.split('(@[a-zA-Z]+(:[a-zA-Z,-_|]+))', auth) if re.search('@(\w+)', i)]) \
-                     if auth else None
-            siteid = dict([(i.strip().split(":")[0], i.strip().split(":")[1]) for i in re.split('(@[a-zA-Z]+(:[a-zA-Z,-_|]+))', site) if re.search('@(\w+)', i)]) \
-                     if site else None
-
             terms = [i.strip() for i in srch_terms if not re.search('(:\w+)', i)]
             terms = [i for i in terms if i]
             terms = terms[0] if terms else ""
-            site_id = siteid['@site'].split("|") if siteid else None
-            auth_id = authid['@auth'].split("|") if authid else None
+
+            siteid = splitify(site, key="@site")
+            authid = splitify(auth, key="@auth")
             #srch_ttle = "@title " + " ".join(srch_hash['@title'].split(",")) if '@title' in srch_hash else None
             #srch_body = "@body " + " ".join(srch_hash['@body'].split(",")) if '@body' in srch_hash else None
-            site_ids_db = getID(",".join(["'%s'" % i.upper() for i in site_id]), sql_type="site_nm") if site_id else None
-            auth_ids_db = getID(",".join(["'%s'" % i for i in auth_id]), sql_type="auth_nm") if auth_id else None
-      
-            if site_id and site_ids_db:
+            site_ids_db = getID(",".join(["'%s'" % i.upper() for i in siteid]), sql_type="site_nm") if siteid else None
+            auth_ids_db = getID(",".join(["'%s'" % i for i in authid]), sql_type="auth_nm") if authid else None
+            
+            if siteid and site_ids_db:
+                print "filtering by site ids"
                 sc.SetFilter('site_id', site_ids_db)
      
-            if auth_id and auth_ids_db:
+            if authid and auth_ids_db:
+                print "filtering by auth ids"
                 sc.SetFilter('auth_id', auth_ids_db)
 
             srch_term_sphx = terms
@@ -123,12 +127,9 @@ class search(object):
         pages = pg.pages_in_set()
         first = pg.first_page()
         last  = pg.last_page()                  
-
-        
+ 
         sk = SkuInfo()
-        ids_listinfo = None
-        if id_select:
-            ids_listinfo = sk.sku_info(id_select, srch_term_sphx, sc) 
+        ids_listinfo = sk.sku_info(id_select, srch_term_sphx, sc) if id_select else None
 
         return render('search_results.mako', rp=ids_listinfo, search_term=display_term, pages=pages, first=first, last=last, current_page=int(page_num) 
                       , limit=limit, auth=auth, site=site, num_rows=num_rows)
