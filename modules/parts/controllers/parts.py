@@ -84,7 +84,6 @@ class search(object):
                 if key in t_id:
                     return t_id[key].split("|")
                
-
         search_query = search_query.strip()
         if re.compile('(@[a-zA-Z]+)').findall(search_query):            
             print "advance query"

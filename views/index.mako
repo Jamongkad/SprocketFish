@@ -5,9 +5,8 @@
 <div style="text-align:center">
     <div id="title">Gear<span id="logo">Fish</span></div>       
     <div id="searchd">
-
-        <%include file="search_form.mako"/>
-
+        <%namespace name="search" file="search_form.mako"/>
+        ${search.search_form()}
         <p id="desc_text">GearFish is an auto enthusiast powered search engine.</p>
     </div> 
     <center>

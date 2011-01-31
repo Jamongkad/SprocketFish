@@ -5,7 +5,8 @@
 <div class="container_12">
     <div id="searchd">
         <div id="title">Gear<span id="logo">Fish</span></div>       
-        <%include file="search_form.mako"/>
+        <%namespace name="search" file="search_form.mako"/>
+        ${search.search_form(params=search_term)}
     </div>  
     <p style="height: 30px"></p>
     <div id="search_results" class="prefix_1">

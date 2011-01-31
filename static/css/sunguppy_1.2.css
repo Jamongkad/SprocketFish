@@ -303,3 +303,31 @@ div#paginate-search {
 div#paginate-search a {
     font-size: 1.5em;
 }
+
+#searchexpand {
+    padding: 10px;
+    margin: 5px 31% 0px 23%;
+}
+
+.infobar {
+    background-color: #F6E69F;    
+    border: 1px solid orange;
+    padding: 5px 10px;
+    text-align: left;
+}
+
+.infobar a {
+    font-size: 16px;    
+}
+
+#helptext {
+    padding-top: 3px;
+}
+
+.helpnodes {
+    margin-bottom: 20px; 
+}
+
+.helpnodes p {
+    padding-top: 3px;
+}

@@ -11,7 +11,7 @@ from db import sql_db as db
 
 import welcome, site_admin, masthead, header, parts
 
-web.config.debug = True
+web.config.debug = False
 
 urls = (
     '/', 'index',

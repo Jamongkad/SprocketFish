@@ -5,8 +5,10 @@
 
 <div class="container_12">
     <div id="searchd">
-        <div id="title">Gear<span id="logo">Fish</span></div>       
-        <%include file="search_form.mako"/>
+        <div id="title">Gear<span id="logo">Fish</span></div>        
+        <%namespace name="search" file="search_form.mako"/>
+        ${search.search_form()}
+
         <div style="padding-top:10px">
             <form method="GET" action="/parts/browse">
             </form>
