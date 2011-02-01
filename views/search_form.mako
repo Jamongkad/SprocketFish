@@ -35,7 +35,7 @@
                 </p>
             </div>
             <div class="helpnodes">
-                <p>Search sample to look for spoon mags on both hcp and gt and posted by user jamongkad</p>
+                <p>Let's put it all together now. Say for instance you're looking for spoon mags on both hcp and gt and posted by the user jamongkad</p>
                 <b><i>e.g. spoon mags @site:hcp|gt @auth:jamongkad</i></b>
             </div>
         </div>
