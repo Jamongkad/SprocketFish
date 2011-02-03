@@ -70,13 +70,17 @@
                 var srchval = $(this).val();
 
                 if(srchval.match(/@auth/)) {
-                    var newval = /@auth:[a-zA-Z0-9|]+/.exec(srchval);
+                    var newval = /@auth:[a-zA-Z0-9_|]+/.exec(srchval);
                     $('input[name="auth"]').val(newval);
+                } else { 
+                    $('input[name="auth"]').val('');
                 } 
                 
                 if(srchval.match(/@site/)) {
-                    var newval = /@site:[a-zA-Z0-9|]+/.exec(srchval);
+                    var newval = /@site:[a-zA-Z0-9_|]+/.exec(srchval);
                     $('input[name="site"]').val(newval);
+                } else { 
+                    $('input[name="site"]').val('');
                 }
                
             }).focus().click(function() {  
@@ -115,6 +119,7 @@
         <a href="http://mixpanel.com/?from=partner"><img src="http://mixpanel.com/site_media/images/mixpanel_partner_logo.gif" alt="Mobile Analytics by Mixpanel" /></a>
      
         </p>
+
     </div>
     </body>
 </html>

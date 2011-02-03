@@ -167,7 +167,7 @@ class view(object):
 class mark(object):
     def GET(self):
         u = web.input()
-        return u['list_id'], u['type']
+        return u['list_id'], u['type'], web.ctx.get('ip')
 
 class browse(object):
     def GET(self):
