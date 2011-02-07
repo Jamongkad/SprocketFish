@@ -18,7 +18,7 @@
         <div class="author">by ${d[2]} </div>
         <span class="date">on ${d[3]}</span>
         <div><a href="${d[4]}" target="_blank">original forum post</a></div>
-       <!--
+        <!--
         <div class="flags"> 
             <div id="flagMsg">Please flag with care:</div> 
             <ul class="flag">
@@ -28,7 +28,6 @@
             </ul>
         </div>
         -->
-
         <div style="padding-top: 20px">${unicode(d[1], errors="ignore")}</div>
     % endfor
     </div>
