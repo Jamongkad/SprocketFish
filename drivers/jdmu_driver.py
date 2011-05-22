@@ -44,31 +44,32 @@ def main():
             print "scraping page 1"
             listings = pq(res.read())
             lists = listings('td.darkrow1').eq(5).parents('tr').siblings('tr').children('td > a[href*="showtopic"]').not_('.linkthru')
-            storage_list = lists.map(lambda i, e: br.find_link(text=pq(e).text().replace("  ", " ")))
-
+            #storage_list = lists.map(lambda i, e: pq(e).attr('href'))
+            print lists
+            """  
             pd = PageData(storage_list, br)\
                      .add_content(post_content, post_author, regex)\
                      .post_date(orig_post_date, edited_post_date, date_regex)\
                      .with_site_id(site_id).if_reform_url(False)
-
             crawler(pd) 
+            """ 
             page += 1
             br.back()
         else:
-            next_page_url = "http://z11.invisionfree.com/JDM_Underground/index.php?showforum=3&prune_day=100&sort_by=Z-A&sort_key=last_post&st=%s" \
-                             % (nxt_pge_cnt)
+            next_page_url = "http://z11.invisionfree.com/JDM_Underground/index.php?showforum=3&prune_day=100&sort_by=Z-A&sort_key=last_post&st=%s" % (nxt_pge_cnt)
             print "Page Count at %s" % (nxt_pge_cnt)
             print "scraping page %s" % (next_page_url)
             res_pg_2 = br.open(next_page_url)
             listings_2 = pq(res_pg_2.read())
             storage_list_2 = listings_2('td.row4 > a[href*="showtopic"]').map(lambda i, e: br.find_link(url=pq(e).attr('href')))
-
+            print storage_list_2
+            """
             pd = PageData(storage_list_2, br)\
                      .add_content(post_content, post_author, regex)\
                      .post_date(orig_post_date, edited_post_date, date_regex)\
                      .with_site_id(site_id).if_reform_url(False)
-
             crawler(pd)
+            """ 
             nxt_pge_cnt += 40
             br.back()
 

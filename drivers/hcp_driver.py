@@ -47,7 +47,7 @@ def main():
                      .add_content(post_content, post_author, regex)\
                      .post_date(orig_post_date, edited_post_date, date_regex)\
                      .with_site_id(site_id).if_reform_url(False)
-
+ 
             crawler(pd)
 
             page += 1
@@ -64,7 +64,7 @@ def main():
                      .add_content(post_content, post_author, regex)\
                      .post_date(orig_post_date, edited_post_date, date_regex)\
                      .with_site_id(site_id).if_reform_url(False)
-            
+             
             crawler(pd)
             nxt_pge_cnt += 1
 

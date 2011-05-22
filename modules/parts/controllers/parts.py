@@ -129,27 +129,10 @@ class search(object):
  
         sk = SkuInfo()
         ids_listinfo = sk.sku_info(id_select, srch_term_sphx, sc) if id_select else None
+        return ids_listinfo
 
         return render('search_results.mako', rp=ids_listinfo, search_term=display_term, pages=pages, first=first, last=last, current_page=int(page_num) 
                       , limit=limit, auth=auth, site=site, num_rows=num_rows)
-        """ 
-        ids_list = None
-
-        search_set_redis = "-".join(search_query.split(" "))
-        
-        if ids: 
-            if r_server.get("search_results:%s:%s:%s" % (search_set_redis, forum, author)):
-                print "from cache:search_results"
-                ids_list_redis = r_server.get("search_results:%s:%s:%s" % (search_set_redis, forum, author))
-                ids_list = cPickle.loads(str(ids_list_redis))
-            else: 
-                print "set cache:search_results"
-                ids_list = sk.sku_info(id_select, search_query, sc)
-                ids_list_for_cache = cPickle.dumps(ids_list)
-                r_server.set("search_results:%s:%s:%s" % (search_set_redis, forum, author), ids_list_for_cache)
-
-        r_server.expire("search_results:%s" % search_set_redis, cache_timeout) 
-        """ 
 
 class view(object):
     

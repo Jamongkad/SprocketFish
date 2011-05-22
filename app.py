@@ -1,17 +1,22 @@
 #!/usr/bin/env python
 import web
-import app_globals
 
-from view import render 
-from forms import LoginAccountForm, CreateAccountForm
-from myrequest import Request
-from SprocketAuth import SprocketAuth
+from helpers.view import render 
+from helpers.forms import LoginAccountForm, CreateAccountForm
+from helpers.myrequest import Request
+from helpers.SprocketAuth import SprocketAuth
 
-from db import sql_db as db
+from helpers.db import sql_db as db
 
 import welcome, site_admin, masthead, header, parts
 
-web.config.debug = False
+from modules.welcome.controllers import welcome
+from modules.site_admin.controllers import site_admin
+from modules.masthead.controllers import masthead
+from modules.header.controllers import header
+from modules.parts.controllers import parts
+
+web.config.debug = True
 
 urls = (
     '/', 'index',
@@ -78,5 +83,5 @@ class maro(object):
         return masthead.index().GET()
 
 if __name__ == "__main__":
-    web.wsgi.runwsgi = lambda func, addr=None: web.wsgi.runfcgi(func, addr)
+    #web.wsgi.runwsgi = lambda func, addr=None: web.wsgi.runfcgi(func, addr)
     app.run()

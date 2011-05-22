@@ -54,6 +54,7 @@ def main():
                      .with_site_id(site_id).if_reform_url(True)
 
             crawler(pd)
+
             page += 1
             #log_message('gt-driver_%d' % (page)) 
             br.back()
@@ -72,6 +73,7 @@ def main():
                      .with_site_id(site_id).if_reform_url(True)
 
             crawler(pd)
+
             nxt_pge_cnt += 25
 
             if(nxt_pge_cnt == end_pge_cnt):

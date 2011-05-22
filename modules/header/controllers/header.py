@@ -1,17 +1,15 @@
-import app_globals
 import web
 
-from view import render
-from myrequest import Request
-from forms import LoginAccountForm, CreateAccountForm
-import masthead
-
+from helpers.view import render
+from helpers.myrequest import Request
+from helpers.forms import LoginAccountForm, CreateAccountForm
+from modules.masthead.controllers import masthead
 urls = (
     '/', 'index',
 )
 
 app = web.application(urls, globals(), autoreload=True)
-from SprocketAuth import SprocketAuth
+from helpers.SprocketAuth import SprocketAuth
 sa = SprocketAuth(app)
 
 class index(object):

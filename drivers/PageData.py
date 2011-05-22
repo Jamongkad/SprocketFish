@@ -31,4 +31,3 @@ class PageData(object):
     def if_reform_url(self, reform_url):
         self.reform_url = reform_url
         return self
-

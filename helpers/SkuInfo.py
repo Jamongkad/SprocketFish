@@ -1,5 +1,5 @@
 import sphinxapi
-from db import sql_db as db
+from db import sql_db, text
 
 class SkuInfo(object):
  
@@ -22,15 +22,15 @@ class SkuInfo(object):
                 listings_posts
                 ON data_prep.list_sku = listings_posts.list_sku
             WHERE 1=1 
-                AND SUBSTRING_INDEX( SUBSTRING_INDEX(listings_posts.idlistings_posts, ':', 2), ':', -1) IN (%(ids)s) 
+                AND SUBSTRING_INDEX( SUBSTRING_INDEX(listings_posts.idlistings_posts, ':', 2), ':', -1) IN (':x')
                 AND listings_posts.list_starter = 1 
                 AND YEAR(data_prep.list_date) <= YEAR(NOW())
                 AND YEAR(data_prep.list_date) >= YEAR(NOW()) - 1
             ORDER BY
                 data_prep.list_date DESC
-            """ % ({'ids': ids})
-
-        rp = db.bind.execute(sql)
+            """ 
+        rp = sql_db.execute(sql, params=dict(x=ids)).fetchall()
+        return rp, ids
 
         entry_object = {}
         storage = []
