@@ -43,9 +43,9 @@ def main():
             print "Underground Parts Url : %s" % (res.geturl()) 
             print "scraping page 1"
             listings = pq(res.read())
-            lists = listings('td.darkrow1').eq(5).parents('tr').siblings('tr').children('td > a[href*="showtopic"]').not_('.linkthru')
+            #lists = listings('td.darkrow1').eq(5).parents('tr').siblings('tr').children('td > a[href*="showtopic"]').not_('.linkthru')
             #storage_list = lists.map(lambda i, e: pq(e).attr('href'))
-            print listings
+            print listings('td.darkrow1')
             """  
             pd = PageData(storage_list, br)\
                      .add_content(post_content, post_author, regex)\
