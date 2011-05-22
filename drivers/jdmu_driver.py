@@ -45,7 +45,7 @@ def main():
             listings = pq(res.read())
             #lists = listings('td.darkrow1').eq(5).parents('tr').siblings('tr').children('td > a[href*="showtopic"]').not_('.linkthru')
             #storage_list = lists.map(lambda i, e: pq(e).attr('href'))
-            print listings('td.darkrow1')
+            print listings('td.darkrow1').text()
             """  
             pd = PageData(storage_list, br)\
                      .add_content(post_content, post_author, regex)\
